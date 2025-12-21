@@ -48,6 +48,10 @@ void kruskalAlgo(edge **edgeList,edge *wallList, int rows, int cols){
     int verticeCount = rows*cols;
     edge *maxEdgeList;
     maxEdgeList = (edge*)malloc(sizeof(edge)*wallCount); //max size
+    if(maxEdgeList == NULL){
+        printf("not enough memory\n");
+        exit(1);
+    }
     DSU d;
 
     initDSU(&d,verticeCount);
@@ -77,6 +81,9 @@ void kruskalAlgo(edge **edgeList,edge *wallList, int rows, int cols){
     }
     *edgeList = realloc(maxEdgeList,newSize * sizeof(edge));
     printEdges(*edgeList,newSize);
+
+    free(d.parent);
+    free(d.rank);
 }
 
 void printEdges(edge *edgeList, int size){
