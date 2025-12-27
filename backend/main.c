@@ -1,5 +1,5 @@
-#include "MazeGenerator/MazeGenerator.h"
-#include "Disjoint Set Union/dsu.h"
+#include "..\backend\MazeGenerator\MazeGenerator.h"
+#include "..\backend\DisjointSetUnion\dsu.h"
 
 #include <stdio.h>
 #include <stdlib.h>
