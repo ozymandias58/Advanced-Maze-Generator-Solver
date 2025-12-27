@@ -1,5 +1,5 @@
 #include "priorityq.h"
-
+#include "..\MazeGenerator\MazeGenerator.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -12,7 +12,7 @@ MinHeap h;
 void initHeap(){
     h.capacity = HEAPINITIALCAP;
     h.size = 0;
-    h.arr = (PQNode*)malloc(sizeof(PQNode)*h.capacity);
+    h.arr = (PQNode*)safe_malloc(sizeof(PQNode)*h.capacity);
 }
 
 void freeHeap(){
@@ -80,7 +80,7 @@ PQNode extract(){
 void insert(int weight, int vertex){
     if(h.size == h.capacity){
         h.capacity *= 2;
-        h.arr = realloc(h.arr,sizeof(PQNode)*h.capacity);
+        h.arr = safe_realloc(h.arr,sizeof(PQNode)*h.capacity);
     }
     PQNode node = {weight,vertex};
     h.arr[h.size++] = node;

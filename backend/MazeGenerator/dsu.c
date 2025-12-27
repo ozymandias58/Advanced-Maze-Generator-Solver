@@ -1,12 +1,12 @@
 #include "dsu.h"
-
+#include "MazeGenerator.h"
 #include <stdlib.h>
 
 //initializes dsu with vertice amount
 void initDSU(DSU *d, int n){
     d->size = n;
-    d->parent = (int*)malloc(sizeof(int)*d->size);
-    d->rank = (int*)malloc(sizeof(int)*d->size);
+    d->parent = (int*)safe_malloc(sizeof(int)*d->size);
+    d->rank = (int*)safe_malloc(sizeof(int)*d->size);
     for(int i=0;i<d->size;i++){
         d->parent[i] = i;
         d->rank[i] = 0;

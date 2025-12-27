@@ -8,7 +8,6 @@ typedef struct {
     int y;
 } Coordinate;
 
-void* safe_malloc(size_t size); //her mallocta kontrol yapmaktan sıkıldım
 
 // Çözüm yolu (Karakterin BFS de yürüyeceği yol)
 extern Coordinate BFSresult[90000];
@@ -31,7 +30,6 @@ extern Coordinate DJKexplored[90000];
 extern int DJKexplored_size;
 
 
-int** convertToAdjMatrix(int rows, int columns, edge* edgeList, int edgeCount);
 
 void solve_BFS(int start, int end, int rows, int columns, int** AdjMatrix);
 
