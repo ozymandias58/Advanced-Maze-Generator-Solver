@@ -2,6 +2,7 @@
 #define PRIORITYQ_H
 
 #define HEAPINITIALCAP 100
+extern MinHeap h;
 
 typedef struct PQNode{
     int distance;
