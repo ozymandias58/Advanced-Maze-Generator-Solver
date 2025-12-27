@@ -1,17 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "stack.h"
+#include "..\MazeGenerator\MazeGenerator.h"
 #define MULTIPLICATIONNUMBER 2
 
 Stack* createStack(int capacity){
-    Stack* s = (Stack*)malloc(sizeof(Stack));
+    Stack* s = (Stack*)safe_malloc(sizeof(Stack));
     s->capacity=capacity;
     s->top=-1;
-    s->data = (int*)malloc(sizeof(int) * capacity);
-    if (s->data == NULL) {
-        printf("Hata Stack malloc ataması basarisiz\n");
-        exit(1);
-    }
+    s->data = (int*)safe_malloc(sizeof(int) * capacity);
     return s;
 }
 
@@ -27,11 +24,7 @@ void freeStack(Stack* s) {
 void push(Stack* s,int sayi){
     if (s->top == s->capacity-1){
         s->capacity *= MULTIPLICATIONNUMBER; 
-        s->data = (int*)realloc(s->data, sizeof(int) * s->capacity);
-        if (s->data == NULL) {
-            printf("Hata Stack realloc atamasi basarısiz\n");
-            exit(1);
-        }
+        s->data = (int*)safe_realloc(s->data, sizeof(int) * s->capacity);
     }
     s->top++;
     s->data[(s->top)] = sayi;

@@ -1,16 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "queue.h"
+#include "..\MazeGenerator\MazeGenerator.h"
 
 Kuyruk* createQueue(int capacity){
-    Kuyruk* k = (Kuyruk*)malloc(sizeof(Kuyruk));
+    Kuyruk* k = (Kuyruk*)safe_malloc(sizeof(Kuyruk));
     k->front=0;k->rear=0;k->elementCount=0;
     k->capacity=capacity;
-    k->data = (int*)malloc(sizeof(int) * capacity);
-        if (k->data == NULL) {
-            printf("Hata queue malloc atamasi gerceklestirilemedi\n");
-            exit(1);
-        }
+    k->data = (int*)safe_malloc(sizeof(int) * capacity);
     return k;
 }
 int isEmptyQ(Kuyruk* k) {
@@ -25,11 +22,7 @@ void freeQueue(Kuyruk* k) {
 void enqueue(Kuyruk* k,int sayi){
     if(k->elementCount==k->capacity){
         k->capacity*=2;
-        k->data = (int*)realloc(k->data, sizeof(int) * k->capacity);        
-        if (k->data == NULL) {
-            printf("Hata queue realloc atamasi gerceklestirilemedi\n");
-            exit(1);
-        }
+        k->data = (int*)safe_realloc(k->data, sizeof(int) * k->capacity);        
     }
     k->data[k->rear] = sayi;
     k->rear++;

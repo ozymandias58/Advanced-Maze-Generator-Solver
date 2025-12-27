@@ -1,5 +1,5 @@
 #include "MazeGenerator.h"
-#include "..\DisjointSetUnion\dsu.h"
+#include "dsu.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -12,10 +12,52 @@ GENERATION:
 */
 
 //All vertices are connected through walls.
+
+void* safe_malloc(size_t size) {
+    void* ptr = malloc(size);
+    if (!ptr) {
+        printf("Malloc ile yer ayirma hatasi");
+        exit(1);
+    }
+    return ptr;
+}
+void* safe_realloc(void* ptr, size_t size) {
+    void* temporaryPointer = realloc(ptr, size);
+    if (!temporaryPointer) {
+        printf("Realloc ile yer ayirma hatasi");
+        exit(1); 
+    }
+    return temporaryPointer;
+}
+
+int** convertToAdjMatrix(int rows,int collumns,edge* edgeList, int edgeCount){
+    int totalCellCount = rows * collumns;
+    int i,j;
+    int** matrix = (int**)safe_malloc(totalCellCount * sizeof(int*));
+    for (i = 0;i < totalCellCount;i++) {
+        // satir icin yer ayir
+        matrix[i] = (int*)safe_malloc(totalCellCount * sizeof(int)); 
+        // satirin her bir hucresini sıfır yap
+        for (j = 0;j < totalCellCount;j++) {
+            matrix[i][j] = 0;
+        }
+    }
+    //yollari giriyorum 
+    for (i = 0; i < edgeCount; i++) {
+        int u = edgeList[i].u;
+        int v = edgeList[i].v;
+        
+        matrix[u][v] = 1; 
+        matrix[v][u] = 1;
+    }
+
+    return matrix;
+}
+
 void initWalls(edge **wallList, int rows, int cols){
     int wallCount = (rows * (cols - 1)) + (cols * (rows - 1));
 
-    *wallList = (edge*)malloc(sizeof(edge)*wallCount);
+    *wallList = (edge*)safe_malloc(sizeof(edge)*wallCount);
 
     int idx = 0;
     for(int r=0; r<rows; r++){
@@ -46,7 +88,7 @@ void kruskalAlgo(edge **edgeList,edge *wallList, int rows, int cols){
     int wallCount = (rows * (cols - 1)) + (cols * (rows - 1));
     int verticeCount = rows*cols;
     edge *maxEdgeList;
-    maxEdgeList = (edge*)malloc(sizeof(edge)*wallCount); //max size
+    maxEdgeList = (edge*)safe_malloc(sizeof(edge)*wallCount); //max size
     if(maxEdgeList == NULL){
         printf("not enough memory\n");
         exit(1);
@@ -78,7 +120,7 @@ void kruskalAlgo(edge **edgeList,edge *wallList, int rows, int cols){
             maxEdgeList[newSize++] = edge;
         }
     }
-    *edgeList = realloc(maxEdgeList,newSize * sizeof(edge));
+    *edgeList = safe_realloc(maxEdgeList,newSize * sizeof(edge));
     printEdges(*edgeList,newSize);
 
     free(d.parent);

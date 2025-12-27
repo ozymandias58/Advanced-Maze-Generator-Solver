@@ -3,44 +3,11 @@
 #include "solver.h"
 #include "queue.h"
 #include "stack.h"
-#include "MazeGenerator.h"
 #include "priorityq.h"
+
+#include "..\MazeGenerator\MazeGenerator.h"
 #define INF 999999
 #define STANDARDWEIGHT 1
-
-
-void* safe_malloc(size_t size) {
-    void* ptr = malloc(size);
-    if (!ptr) {
-        printf("Malloc ile yer ayirma hatasi");
-        exit(1);
-    }
-    return ptr;
-}
-
-int** convertToAdjMatrix(int rows,int collumns,edge* edgeList, int edgeCount){
-    int totalCellCount = rows * collumns;
-    int i,j;
-    int** matrix = (int**)safe_malloc(totalCellCount * sizeof(int*));
-    for (i = 0;i < totalCellCount;i++) {
-        // satir icin yer ayir
-        matrix[i] = (int*)safe_malloc(totalCellCount * sizeof(int)); 
-        // satirin her bir hucresini sıfır yap
-        for (j = 0;j < totalCellCount;j++) {
-            matrix[i][j] = 0;
-        }
-    }
-    //yollari giriyorum 
-    for (i = 0; i < edgeCount; i++) {
-        int u = edgeList[i].u;
-        int v = edgeList[i].v;
-        
-        matrix[u][v] = 1; 
-        matrix[v][u] = 1;
-    }
-
-    return matrix;
-}
 
 void solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
     int totalCellCount= rows*collumns;
@@ -207,6 +174,3 @@ void solve_Dijkstra(int start, int end, int rows, int collumns, int** AdjMatrix)
     free(visited);
     freeHeap();
 }
-
-
-
