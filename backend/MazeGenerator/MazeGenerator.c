@@ -46,9 +46,10 @@ int** convertToAdjMatrix(int rows,int collumns,edge* edgeList, int edgeCount){
     for (i = 0; i < edgeCount; i++) {
         int u = edgeList[i].u;
         int v = edgeList[i].v;
+        int w = edgeList[i].w;
         
-        matrix[u][v] = 1; 
-        matrix[v][u] = 1;
+        matrix[u][v] = w; 
+        matrix[v][u] = w;
     }
 
     return matrix;
