@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "queue.h"
-#include "..\MazeGenerator\MazeGenerator.h"
+#include "MazeGenerator.h"
 
 Kuyruk* createQueue(int capacity){
     Kuyruk* k = (Kuyruk*)safe_malloc(sizeof(Kuyruk));

@@ -1,5 +1,5 @@
 #include "priorityq.h"
-#include "..\MazeGenerator\MazeGenerator.h"
+#include "MazeGenerator.h"
 #include <stdio.h>
 #include <stdlib.h>
 

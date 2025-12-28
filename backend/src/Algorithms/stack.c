@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "stack.h"
-#include "..\MazeGenerator\MazeGenerator.h"
+#include "MazeGenerator.h"
 #define MULTIPLICATIONNUMBER 2
 
 Stack* createStack(int capacity){

@@ -1,4 +1,4 @@
-#include "..\MazeGenerator\MazeGenerator.h"
+#include "MazeGenerator.h"
 
 #include <stdlib.h>
 

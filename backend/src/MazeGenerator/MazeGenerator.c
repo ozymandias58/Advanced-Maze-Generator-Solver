@@ -85,7 +85,7 @@ void initWalls(edge **wallList, int rows, int cols){
 }
 
 //Knocks walls one by one until each vertice is connected
-void kruskalAlgo(edge **edgeList,edge *wallList, int rows, int cols){
+void kruskalAlgo(edge **edgeList,edge *wallList, int rows, int cols, int* edgeCount){
     int wallCount = (rows * (cols - 1)) + (cols * (rows - 1));
     int verticeCount = rows*cols;
     edge *maxEdgeList;
@@ -121,8 +121,9 @@ void kruskalAlgo(edge **edgeList,edge *wallList, int rows, int cols){
             maxEdgeList[newSize++] = edge;
         }
     }
+    *edgeCount = newSize;
     *edgeList = safe_realloc(maxEdgeList,newSize * sizeof(edge));
-    printEdges(*edgeList,newSize);
+    //printEdges(*edgeList,newSize);
 
     free(d.parent);
     free(d.rank);
@@ -132,5 +133,15 @@ void printEdges(edge *edgeList, int size){
     printf("\n");
     for(int i=0;i<size;i++){
         printf("%d connects to %d with weight %d\n", edgeList[i].u,edgeList[i].v,edgeList[i].w);
+    }
+}
+
+void printAdjMatrix(int** mat, int row, int col){
+    int totalCellCount = row*col;
+    for(int i=0;i<totalCellCount;i++){
+        printf("\n%d: ",i);
+        for(int j=0; j<totalCellCount; j++){
+            printf("%d, ",mat[i][j]);
+        }
     }
 }

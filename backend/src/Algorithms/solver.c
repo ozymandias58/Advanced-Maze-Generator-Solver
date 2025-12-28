@@ -5,9 +5,23 @@
 #include "stack.h"
 #include "priorityq.h"
 
-#include "..\MazeGenerator\MazeGenerator.h"
+#include "MazeGenerator.h"
 #define INF 999999
 #define STANDARDWEIGHT 1
+
+// The actual memory allocation for the variables declared in solver.h
+Coordinate BFSresult[1000];
+int BFSresult_size = 0;
+Coordinate DFSresult[1000];
+int DFSresult_size = 0;
+Coordinate DJKresult[1000];
+int DJKresult_size = 0;
+Coordinate BFSexplored[1000];
+int BFSexplored_size = 0;
+Coordinate DFSexplored[1000];
+int DFSexplored_size = 0;
+Coordinate DJKexplored[1000];
+int DJKexplored_size = 0;
 
 void solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
     int totalCellCount= rows*collumns;

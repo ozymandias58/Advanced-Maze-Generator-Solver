@@ -1,6 +1,8 @@
 #ifndef MAZE_GENERATOR_H
 #define MAZE_GENERATOR_H
 
+#include <stdio.h>
+
 typedef struct edge{
     int u;
     int v;
@@ -11,7 +13,8 @@ void* safe_malloc(size_t size); //her mallocta kontrol yapmaktan sıkıldım
 void* safe_realloc(void* ptr, size_t size);
 int** convertToAdjMatrix(int rows, int columns, edge* edgeList, int edgeCount);
 void initWalls(edge **wallList, int rows, int cols);
-void kruskalAlgo(edge **edgeList, edge *wallList, int rows, int cols);
+void kruskalAlgo(edge **edgeList, edge *wallList, int rows, int cols, int* edgeCount);
 void printEdges(edge *edgeList, int size);
+void printAdjMatrix(int **mat, int row, int col);
 
 #endif
