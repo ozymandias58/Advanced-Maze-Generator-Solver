@@ -12,8 +12,9 @@ typedef struct edge{
 void* safe_malloc(size_t size); //her mallocta kontrol yapmaktan sıkıldım
 void* safe_realloc(void* ptr, size_t size);
 int** convertToAdjMatrix(int rows, int columns, edge* edgeList, int edgeCount);
+int *weightGenerator(int totalEdgeCount);
 void initWalls(edge **wallList, int rows, int cols);
-void kruskalAlgo(edge **edgeList, edge *wallList, int rows, int cols, int* edgeCount);
+void kruskalAlgo(edge **edgeList, edge *wallList, int rows, int cols, int* edgeCount, int option_weight);
 void printEdges(edge *edgeList, int size);
 void printAdjMatrix(int **mat, int row, int col);
 

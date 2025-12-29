@@ -35,7 +35,7 @@ int main(){
             }
             printf("before init");
             initWalls(&wallList,rows,cols);
-            kruskalAlgo(&edgeList,wallList,rows,cols,&edgeCount);
+            kruskalAlgo(&edgeList,wallList,rows,cols,&edgeCount,0);
             adjMat = convertToAdjMatrix(rows,cols,edgeList,edgeCount);
             printf("\n\n\nSecenekleri atliyorum\n\n\n");
             printf("Labirent:");

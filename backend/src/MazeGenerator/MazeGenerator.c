@@ -55,10 +55,25 @@ int** convertToAdjMatrix(int rows,int collumns,edge* edgeList, int edgeCount){
     return matrix;
 }
 
-void initWalls(edge **wallList, int rows, int cols){
+int* weightGenerator(int totalEdgeCount){
+    int* edgeWeights = safe_malloc(totalEdgeCount * sizeof(int));
+    for(int i=0;i<totalEdgeCount;i++){
+        int roll = rand()%3;
+        if(roll == 0) edgeWeights[i] = 2;
+        else edgeWeights[i] = 1;
+    }
+    return edgeWeights;
+}
+
+void initWalls(edge **wallList, int rows, int cols, int option_weight){
     int wallCount = (rows * (cols - 1)) + (cols * (rows - 1));
 
     *wallList = (edge*)safe_malloc(sizeof(edge)*wallCount);
+
+    //weight option
+    int* edgeWeights;
+    if(option_weight)
+        edgeWeights = weightGenerator(wallCount);
 
     int idx = 0;
     for(int r=0; r<rows; r++){
@@ -69,7 +84,8 @@ void initWalls(edge **wallList, int rows, int cols){
                 edge wall;
                 wall.u = cur_cell;
                 wall.v = cur_cell + 1;
-                wall.w = 1;
+                if(option_weight) wall.w = edgeWeights[idx];
+                else wall.w = 1;
                 (*wallList)[idx++] = wall;
             }
 
@@ -77,11 +93,13 @@ void initWalls(edge **wallList, int rows, int cols){
                 edge wall;
                 wall.u = cur_cell;
                 wall.v = cur_cell + cols;
-                wall.w = 1;
+                if(option_weight) wall.w = edgeWeights[idx];
+                else wall.w = 1;
                 (*wallList)[idx++] = wall;
             }
         }
     }
+    free(edgeWeights);
 }
 
 //Knocks walls one by one until each vertice is connected
