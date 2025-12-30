@@ -23,7 +23,8 @@ int DFSexplored_size = 0;
 Coordinate DJKexplored[1000];
 int DJKexplored_size = 0;
 
-void solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
+TestResult solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
+    TestResult res={"BFS",0,0};
     int totalCellCount= rows*collumns;
     BFSexplored_size=0;BFSresult_size=0;
     int* visited=(int*)safe_malloc(totalCellCount*sizeof(int));
@@ -35,32 +36,41 @@ void solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
     enqueue(q,start);
     int foundFlag = 0;
     while(!isEmptyQ(q)){
-    int current=dequeue(q);
-    BFSexplored[BFSexplored_size].x=current/collumns;
-    BFSexplored[BFSexplored_size].y=current%collumns;
-    BFSexplored_size++;
-    if (current==end) {
-            foundFlag=1;
-            break;
-        }
-    int neighbour;
-    for (int neighbor=0; neighbor < totalCellCount; neighbor++) { //tum komsulari dolaşıp daha once ziyaret edilmemis ve degeri 1 olanları quueue'ye al
-            if (AdjMatrix[current][neighbor] == 1 && !visited[neighbor]) {
-                visited[neighbor] = 1;
-                parent[neighbor]=current;
-                enqueue(q,neighbor);
+        int current=dequeue(q);
+        BFSexplored[BFSexplored_size].x=current/collumns;
+        BFSexplored[BFSexplored_size].y=current%collumns;
+        BFSexplored_size++;
+        if (current==end) {
+                foundFlag=1;
+                break;
             }
-        }
+        int neighbour;
+        for (int neighbor=0; neighbor < totalCellCount; neighbor++) { //tum komsulari dolaşıp daha once ziyaret edilmemis ve degeri 1 olanları quueue'ye al
+                if (AdjMatrix[current][neighbor] == 1 && !visited[neighbor]) {
+                    visited[neighbor] = 1;
+                    parent[neighbor]=current;
+                    enqueue(q,neighbor);
+                }
+            }
     }
     if(foundFlag){ //bulundugu zaman yapılacak seyler
         int tempPath[90000];
         int temporary=end;
         int totalStepsCount=0;
-        int i;
-        while(temporary!=-1){//geriden baslayip en basa geliyorum cunku en bas -1 i gosteriyor
-            tempPath[totalStepsCount++]= temporary;
-            temporary =parent[temporary];            
-        }
+        int totalWeight=0;
+        int i,p;
+        while (temporary!=-1) {
+            tempPath[totalStepsCount]=temporary;
+            p=parent[temporary];
+            
+            if (p != -1) {
+                totalWeight+=AdjMatrix[p][temporary];
+            }
+            totalStepsCount++;
+            temporary=p;
+    }
+        res.steps=totalStepsCount;
+        res.weight=totalWeight;
         BFSresult_size=totalStepsCount;
 
         for(int i=0;i<totalStepsCount;i++){
@@ -69,12 +79,13 @@ void solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
             BFSresult[i].y=vertexID%collumns;
         }
     }
-    free(visited);
-    free(parent);
-    freeQueue(q);
+    free(visited);free(parent);freeQueue(q);
+    return res;
+
     }
 
-void solve_DFS(int start, int end, int rows, int collumns, int** AdjMatrix){
+TestResult solve_DFS(int start, int end, int rows, int collumns, int** AdjMatrix){
+    TestResult res={"DFS",0,0};
     int totalCellCount=rows*collumns;
     DFSexplored_size=0;DFSresult_size=0;
     int* visited = (int*)safe_malloc(totalCellCount*sizeof(int));
@@ -122,11 +133,10 @@ void solve_DFS(int start, int end, int rows, int collumns, int** AdjMatrix){
         }      
 
     }
-    free(visited);
-    free(parent);
-    freeStack(s);
+    free(visited);free(parent);freeStack(s);
 }
-void solve_Dijkstra(int start, int end, int rows, int collumns, int** AdjMatrix) {
+TestResult solve_Dijkstra(int start, int end, int rows, int collumns, int** AdjMatrix) {
+    TestResult res ={"Dijkstra",0,0};
     int totalCellCount = rows*collumns;
     DJKexplored_size=0;DJKresult_size = 0;
     int i;
@@ -183,8 +193,7 @@ void solve_Dijkstra(int start, int end, int rows, int collumns, int** AdjMatrix)
             DJKresult[i].y=vertexID%collumns;
         }
     }
-    free(distance);
-    free(parent);
-    free(visited);
-    freeHeap();
+    
+    free(distance);free(parent);free(visited);freeHeap();
+    return res;
 }
