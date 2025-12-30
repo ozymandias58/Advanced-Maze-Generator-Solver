@@ -14,7 +14,7 @@ int DynamicSTKpop(int *stk, int *top) {
     return stk[(*top)--];
 }
 
-int DynamicWallDFS(int totalCells, int adjMat[totalCells][totalCells], int src, int target) {
+int DynamicWallDFS(int totalCells, int** adjMat, int src, int target) {
 
     int* stk = (int*)malloc(sizeof(int) * totalCells);
     int* visited = (int*)calloc(totalCells, sizeof(int)); // calloc initializes to 0
@@ -43,7 +43,7 @@ int DynamicWallDFS(int totalCells, int adjMat[totalCells][totalCells], int src, 
     return -1;
 }
 
-void DynamicWallChange(int rows, int cols, int totalCells, int adjMat[totalCells][totalCells]) {
+void DynamicWallChange(int rows, int cols, int totalCells, int **adjMat) {
     //find 1 possible new connection (that node is v)
     //find a path from v to u through dfs (last is n)
     //sever the n-u
