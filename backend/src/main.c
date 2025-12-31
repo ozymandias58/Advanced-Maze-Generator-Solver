@@ -14,6 +14,9 @@ int main(){
     int** adjMat = NULL;
     int action = 0;
     int exit = 0;
+
+    int option_weight = 1,option_dynamic = 0,option_multidest = 0;
+
     while(exit == 0){
         printf("Ana Ekran\n");
         printf("Test olusturmak icin 1\nTest yuklemek icin 2\nCikmak icin 3\n");
@@ -34,8 +37,8 @@ int main(){
                 if(edgeList != NULL) { free(edgeList); edgeList = NULL; }
             }
             printf("before init");
-            initWalls(&wallList,rows,cols);
-            kruskalAlgo(&edgeList,wallList,rows,cols,&edgeCount,0);
+            initWalls(&wallList,rows,cols,option_weight);
+            kruskalAlgo(&edgeList,wallList,rows,cols,&edgeCount);
             adjMat = convertToAdjMatrix(rows,cols,edgeList,edgeCount);
             printf("\n\n\nSecenekleri atliyorum\n\n\n");
             printf("Labirent:");

@@ -11,7 +11,7 @@ GENERATION:
 3- Turn that into an adjacency matrix if needed
 */
 
-//All vertices are connected through walls.
+//All vertices are connected throgh walls.
 
 void* safe_malloc(size_t size) {
     void* ptr = malloc(size);
@@ -54,6 +54,7 @@ int** convertToAdjMatrix(int rows,int collumns,edge* edgeList, int edgeCount){
 
     return matrix;
 }
+
 
 int* weightGenerator(int totalEdgeCount){
     int* edgeWeights = safe_malloc(totalEdgeCount * sizeof(int));

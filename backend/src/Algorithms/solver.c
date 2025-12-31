@@ -6,6 +6,7 @@
 #include "priorityq.h"
 
 #include "MazeGenerator.h"
+
 #define INF 999999
 #define STANDARDWEIGHT 1
 
@@ -186,6 +187,9 @@ TestResult solve_Dijkstra(int start, int end, int rows, int collumns, int** AdjM
             tempPath[totalStepsCount++]=temporary;
             temporary=parent[temporary];            
         }
+
+
+
         DJKresult_size=totalStepsCount;
         for (int i=0;i<totalStepsCount;i++) {
             int vertexID = tempPath[totalStepsCount-1-i];
