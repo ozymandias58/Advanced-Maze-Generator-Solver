@@ -1,10 +1,23 @@
 #ifndef DYNAMIC_WALLS_H
 #define DYNAMIC_WALLS_H
 
+enum UPDATE{
+    UPDATE_ADD,
+    UPDATE_REMOVE
+};
+
+typedef struct MatrixUpdate{
+    UPDATE update;
+    int u;
+    int v;
+    int w;
+}MatrixUpdate;
+
 void DynamicSTKpush(int *stk, int v, int *top);
 int DynamicSTKpop(int *stk, int *top);
 int DynamicWallDFS(int totalCells, int **adjMat, int src, int target);
-int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat); //eğer return ettiği ziyaretimize komşuysa onu da queue stack heap falan ekle
+int initDynamicModule(MatrixUpdate *updates, int *updateIndex); //call this first. It initializes 10 updates
+int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUpdate *updates, int *updateIndex); //eğer return ettiği ziyaretimize komşuysa onu da queue stack heap falan ekle
 
 
 #endif

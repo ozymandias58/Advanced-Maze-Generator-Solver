@@ -1,4 +1,5 @@
 #include "MazeGenerator.h"
+#include "DynamicWalls.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,11 +42,17 @@ int DynamicWallDFS(int totalCells, int** adjMat, int src, int target) {
     return -1;
 }
 
-int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat) {
+int initDynamicModule(MatrixUpdate* updates){
+    updates = (MatrixUpdate*)safe_malloc(10*sizeof(MatrixUpdate));
+}
+
+int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUpdate* updates, ) {
     //find 1 possible new connection (that node is v)
     //find a path from v to u through dfs (last is n)
     //sever the n-u
     //connect v-u
+
+    //add the change to updates
     //return u
     int u = -1, v = -1;
     
@@ -76,8 +83,12 @@ int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat) {
 
     if (n != -1) {
         //sever n-u and connect v-u
+        int temp_w = adjMat[u][n];
         adjMat[u][n] = adjMat[n][u] = 0;
-        adjMat[u][v] = adjMat[v][u] = 1;
+        adjMat[u][v] = adjMat[v][u] = temp_w;
+        MatrixUpdate addU = {UPDATE_ADD,u,v,temp_w};
+        MatrixUpdate severU = {UPDATE_REMOVE,u,n,0};
+
     }
     return u;
 }
