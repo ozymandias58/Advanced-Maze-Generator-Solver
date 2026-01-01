@@ -24,6 +24,7 @@ int DFSexplored_size = 0;
 Coordinate DJKexplored[1000];
 int DJKexplored_size = 0;
 
+
 TestResult solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
     TestResult res={"BFS",0,0};
     int totalCellCount= rows*collumns;

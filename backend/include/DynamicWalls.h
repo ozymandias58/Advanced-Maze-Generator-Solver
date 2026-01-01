@@ -7,7 +7,7 @@ enum UPDATE{
 };
 
 typedef struct MatrixUpdate{
-    UPDATE update;
+    enum UPDATE update;
     int u;
     int v;
     int w;
