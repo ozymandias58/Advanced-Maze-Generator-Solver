@@ -94,12 +94,3 @@ int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUp
     }
     return u;
 }
-
-
-/*mazegenerator **adjMat
-testResult = bfs(adjMat)
-adjMat ile testResult gui
-
-adjmat1 adjmat2 adjmat3 adjmat4
-tR [0,2,4,6,5,7,8,9,1] change[2,5]
-*/
