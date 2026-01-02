@@ -42,12 +42,12 @@ int DynamicWallDFS(int totalCells, int** adjMat, int src, int target) {
     return -1;
 }
 
-int initDynamicModule(MatrixUpdate* updates, int* updateIndex){
+int initDynamicModule(MatrixUpdate* updates, int *updateIndex){
     updates = (MatrixUpdate*)safe_malloc(10*sizeof(MatrixUpdate));
     *updateIndex = 0;
 }
 
-int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUpdate* updates, int* updateIndex) {
+int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUpdate* updates, int *updateIndex) {
     //find 1 possible new connection (that node is v)
     //find a path from v to u through dfs (last is n)
     //sever the n-u
