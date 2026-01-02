@@ -89,7 +89,8 @@ int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUp
         adjMat[u][v] = adjMat[v][u] = temp_w;
         MatrixUpdate addU = {UPDATE_ADD,u,v,temp_w};
         MatrixUpdate severU = {UPDATE_REMOVE,u,n,0};
-
+        updates[(*updateIndex)++] = addU;
+        updates[(*updateIndex)++] = severU;
     }
     return u;
 }
