@@ -10,13 +10,20 @@
 MinHeap h;
 
 void initHeap(){
+    if (h.arr != NULL) { //NULL dan farklıysa pointerı 0 la
+        freeHeap();
+        h.arr = NULL;
+    }
     h.capacity = HEAPINITIALCAP;
     h.size = 0;
     h.arr = (PQNode*)safe_malloc(sizeof(PQNode)*h.capacity);
 }
 
 void freeHeap(){
-    free(h.arr);
+    if(h.arr!=NULL){
+        free(h.arr);
+        h.arr=NULL;
+    }
 }
 
 int getLeftIndex(int index){

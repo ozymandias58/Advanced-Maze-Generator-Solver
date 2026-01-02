@@ -4,6 +4,10 @@
 #include "MazeGenerator.h"
 #include "testresult.h"
 
+#define DEFAULTSIZE 1000
+#define INF 999999 //sonsuzluga yakin yani
+#define COST 90000
+
 typedef struct {
     int x;
     int y;
@@ -11,25 +15,30 @@ typedef struct {
 
 
 // Çözüm yolu (Karakterin BFS de yürüyeceği yol)
-extern Coordinate BFSresult[1000];
+extern Coordinate BFSresult[DEFAULTSIZE];
 extern int BFSresult_size;
 // Çözüm yolu (Karakterin DFS de yürüyeceği yol)
-extern Coordinate DFSresult[1000];
+extern Coordinate DFSresult[DEFAULTSIZE];
 extern int DFSresult_size;
 // Çözüm yolu (Karakterin Dijkstra da yürüyeceği yol)
-extern Coordinate DJKresult[1000];
+extern Coordinate DJKresult[DEFAULTSIZE];
 extern int DJKresult_size;
+// Çözüm yolu (Karakterin A* da yürüyeceği yol)
+extern Coordinate ASTresult[DEFAULTSIZE];
+extern int ASTresult_size;
 
 // BFS Arama sırası (GUI da renklendirilcek tüm hücreler)
-extern Coordinate BFSexplored[1000];
+extern Coordinate BFSexplored[DEFAULTSIZE];
 extern int BFSexplored_size;
 // DFS Arama sırası (GUI da renklendirilcek tüm hücreler)
-extern Coordinate DFSexplored[1000];
+extern Coordinate DFSexplored[DEFAULTSIZE];
 extern int DFSexplored_size;
 // Dijkstra Arama sırası (GUI da renklendirilcek tüm hücreler)
-extern Coordinate DJKexplored[1000];
+extern Coordinate DJKexplored[DEFAULTSIZE];
 extern int DJKexplored_size;
-
+//A* Arama sırası (GUI da renklendirilcek tüm hücreler) 
+extern Coordinate ASTexplored[DEFAULTSIZE];
+extern int ASTexplored_size;
 
 
 TestResult solve_BFS(int start, int end, int rows, int columns, int** AdjMatrix);

@@ -1,29 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "solver.h"
 #include "queue.h"
 #include "stack.h"
 #include "priorityq.h"
-
 #include "MazeGenerator.h"
 
-#define INF 999999 //sonsuzluga yakin yani
-#define STANDARDWEIGHT 1
-
 // The actual memory allocation for the variables declared in solver.h
-Coordinate BFSresult[1000];
+Coordinate BFSresult[DEFAULTSIZE];
 int BFSresult_size = 0;
-Coordinate DFSresult[1000];
+Coordinate DFSresult[DEFAULTSIZE];
 int DFSresult_size = 0;
-Coordinate DJKresult[1000];
+Coordinate DJKresult[DEFAULTSIZE];
 int DJKresult_size = 0;
-Coordinate BFSexplored[1000];
+Coordinate BFSexplored[DEFAULTSIZE];
 int BFSexplored_size = 0;
-Coordinate DFSexplored[1000];
+Coordinate DFSexplored[DEFAULTSIZE];
 int DFSexplored_size = 0;
-Coordinate DJKexplored[1000];
+Coordinate DJKexplored[DEFAULTSIZE];
 int DJKexplored_size = 0;
-
+Coordinate ASTresult[DEFAULTSIZE];
+int ASTresult_size = 0;
+Coordinate ASTexplored[DEFAULTSIZE];
+int ASTexplored_size = 0;
 
 TestResult solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
     TestResult res={"BFS", 0, 0, NULL, 0, NULL, 0, NULL, NULL};
@@ -62,7 +62,7 @@ TestResult solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
             res.explored[i]=BFSexplored[i].x * collumns + BFSexplored[i].y;
         }
     if(foundFlag){ //bulundugu zaman yapılacak seyler
-        int tempPath[90000];
+        int tempPath[COST];
         int temporary=end;
         int totalStepsCount=0;
         int totalWeight=0;
@@ -77,6 +77,7 @@ TestResult solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
             totalStepsCount++;
             temporary=p;
     }
+        res.resultCount = totalStepsCount;
         res.steps=totalStepsCount;
         res.weight=totalWeight;
         BFSresult_size=totalStepsCount;
@@ -129,13 +130,14 @@ TestResult solve_DFS(int start, int end, int rows, int collumns, int** AdjMatrix
 
         }
     }
+    
     res.exploredCount=DFSexplored_size;
     res.explored=(int*)safe_malloc(sizeof(int)*res.exploredCount);
     for(i=0;i<res.exploredCount;i++) {
         res.explored[i] = DFSexplored[i].x * collumns + DFSexplored[i].y;
     }
     if(foundFlag){
-        int tempPath[90000];
+        int tempPath[COST];
         int temporary=end;
         int totalStepsCount=0,totalWeight=0,p;
         while (temporary!=-1) { //geriden baslayip en basa geliyorum cunku en bas -1 i gosteriyor
@@ -154,6 +156,7 @@ TestResult solve_DFS(int start, int end, int rows, int collumns, int** AdjMatrix
             DFSresult[i].x=vertexID/collumns; 
             DFSresult[i].y=vertexID%collumns;
         }
+        res.resultCount = totalStepsCount;
         res.steps = totalStepsCount;res.weight = totalWeight;res.resultCount = totalStepsCount;  
         res.result=(int*)safe_malloc(sizeof(int)*res.steps);
         for(i = 0; i < res.steps; i++) {
@@ -214,7 +217,7 @@ TestResult solve_Dijkstra(int start, int end, int rows, int collumns, int** AdjM
     }
 
     if(foundFlag){
-        int tempPath[90000];
+        int tempPath[COST];
         int temporary=end;
         int totalStepsCount=0,totalWeight=0 ;
         int p;
@@ -235,6 +238,7 @@ TestResult solve_Dijkstra(int start, int end, int rows, int collumns, int** AdjM
             DJKresult[i].x=vertexID/collumns; 
             DJKresult[i].y=vertexID%collumns;
         }
+        res.resultCount = totalStepsCount;
         res.steps=totalStepsCount;
         res.weight=totalWeight;
         res.result = (int*)safe_malloc(sizeof(int) * res.steps);
@@ -249,10 +253,71 @@ TestResult solve_Dijkstra(int start, int end, int rows, int collumns, int** AdjM
 }
 
 TestResult solve_Astar(int start, int end, int rows, int collumns, int** AdjMatrix){ //g(n):baslangictan su anki hücreye kadar harcanan enereji (ağırlıklar 1 ve 2 arasında değişiyor) h(n)=getPerpendicularDistance(dik uzaklığı alıyor),f(n):h(n)veg(n) toplamıdır
-    TestResult res={"Astar",0,0};
-    
+    TestResult res = {"Astar", 0, 0, NULL, 0, NULL, 0, NULL, NULL};
+    int totalCellCount=rows*collumns;
+    int i,j;
+    int* realCost=(int*)safe_malloc(totalCellCount*sizeof(int));//realcost= baslangictan su anki hucreye kadar maliyet
+    for(i=0;i<totalCellCount;i++)   realCost[i]=INF; //hepsi sonsuz
+    int* parent=(int*)safe_malloc(totalCellCount*sizeof(int));
+    for(i=0;i<totalCellCount;i++)   parent[i]=-1; //hepsi -1
+    int* visited=(int*)safe_malloc(totalCellCount*sizeof(int));
+    for(i=0;i<totalCellCount;i++)   visited[i]=0; //hepsi 0
 
+    initHeap();
+    realCost[start]=0;
+    int perpCost=getPerpendicularDistance(start,end,collumns);
+    insert(perpCost,start);
+    int foundFlag=0;
+    while(h.size>0){
+        PQNode currentPQNode=extract();
+        int current=currentPQNode.vertex;
+        if(visited[current]==1) continue;
+        visited[current]=1;
+        ASTexplored[ASTexplored_size].x = current / collumns;
+        ASTexplored[ASTexplored_size].y = current % collumns;
+        ASTexplored_size++;
+        if(current==end){
+            foundFlag=1;
+            break;
+        }
+        for(j=0;j<totalCellCount;j++){
+            int weight=AdjMatrix[current][j];
+            if(weight>0){
+                if(realCost[current]+weight<realCost[j]){
+                    realCost[j]=realCost[current]+weight;
+                    parent[j]=current;
 
+                    int finalCost=realCost[j]+getPerpendicularDistance(j,end,collumns);
+                    insert(finalCost,j);
+                }
+            }
+        }
+    }
+    res.exploredCount=ASTexplored_size;
+    res.explored=(int*)safe_malloc(sizeof(int)*res.exploredCount);
+    for (i=0;i<res.exploredCount;i++)
+        res.explored[i]=ASTexplored[i].x*collumns+ASTexplored[i].y;
 
+    if(foundFlag){
+        int tempPath[COST];
+        int temporary=end;
+        int totalStepsCount=0,totalWeight=0 ;
+        int p;   
+        while(temporary!=-1){
+            tempPath[totalStepsCount]=temporary;
+            p=parent[temporary];
+            if(p!=-1)
+                totalWeight+=AdjMatrix[p][temporary];
+            totalStepsCount++;
+            temporary=p;
+        }
+        res.steps=totalStepsCount;
+        res.weight=totalWeight;
+        res.resultCount=totalStepsCount;
+        res.result=(int*)safe_malloc(sizeof(int)*res.steps);
+        for (i = 0; i < res.steps; i++) 
+            res.result[i] = tempPath[res.steps-1-i]; 
+    }
+    free(realCost); free(parent); free(visited); freeHeap();
     return res;
 }
