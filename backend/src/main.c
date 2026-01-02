@@ -1,6 +1,7 @@
 #include "MazeGenerator.h"
 #include "dsu.h"
 #include "solver.h"
+#include "FileManager.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,13 +37,15 @@ int main(){
                 if(wallList != NULL) { free(wallList); wallList = NULL; }
                 if(edgeList != NULL) { free(edgeList); edgeList = NULL; }
             }
-            printf("before init");
             initWalls(&wallList,rows,cols,option_weight);
             kruskalAlgo(&edgeList,wallList,rows,cols,&edgeCount);
             adjMat = convertToAdjMatrix(rows,cols,edgeList,edgeCount);
             printf("\n\n\nSecenekleri atliyorum\n\n\n");
             printf("Labirent:");
             printAdjMatrix(adjMat,rows,cols);
+            int testSize = 5;
+            TestResult *test = (TestResult*)safe_malloc(sizeof(TestResult)*testSize);
+            createJSON(adjMat,rows,cols,test,testSize);
             exit = 1;
         }
     }
