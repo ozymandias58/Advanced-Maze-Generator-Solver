@@ -12,7 +12,9 @@ typedef struct TestResult{
 
     //GUI'ye gönderilecekler
     int* explored; //keşfetme sırası (gui için boyama sırası)
+    int exploredCount;//kaç hücre keşfedildi
     int* result; //bulunan yolun sırası
+    int resultCount;//result yolunda kaç hücre var
     int* dynamicChangeIndexes; //duvarın değiştiği turların sırası (YANİ BOYAMA YAPILIRKEN HANGİ ARALARDA DUVAR DEĞİŞSİN)
     MatrixUpdate* dynamicChangeUpdates; //Duvar değişeceğinde yapılan güncellemeler
 

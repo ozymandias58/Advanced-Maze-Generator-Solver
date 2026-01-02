@@ -9,10 +9,10 @@ typedef struct kuyruk {
     int* data;        // vertex
 } Kuyruk;
 
-Kuyruk* createQueue(int capacity);    
-int isEmptyQ(Kuyruk* k);              
-void enqueue(Kuyruk* k, int sayi);  
-int dequeue(Kuyruk* k);              
-void freeQueue(Kuyruk* k);           
+Kuyruk* createQueue(int capacity);//kuyruk olustur
+int isEmptyQ(Kuyruk* k);//kuyruk bos mu         
+void enqueue(Kuyruk* k, int sayi); //kuyruga al 
+int dequeue(Kuyruk* k);      //kuyruktan cikar        
+void freeQueue(Kuyruk* k); //#freekuyruk          
 
 #endif

@@ -54,6 +54,14 @@ int** convertToAdjMatrix(int rows,int collumns,edge* edgeList, int edgeCount){
 
     return matrix;
 }
+int getPerpendicularDistance(int currentID,int targetID,int collumns) {
+    int x1=currentID/collumns;
+    int y1=currentID%collumns;
+    int x2 =targetID/collumns;
+    int y2 =targetID%collumns;
+    return abs(x1-x2)+abs(y1-y2);
+}
+
 
 
 int* weightGenerator(int totalEdgeCount){

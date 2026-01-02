@@ -38,4 +38,6 @@ TestResult solve_DFS(int start, int end, int rows, int columns, int** AdjMatrix)
 
 TestResult solve_Dijkstra(int start, int end, int rows, int collumns, int** AdjMatrix);
 
+TestResult solve_Astar(int start, int end, int rows, int collumns, int** AdjMatrix);
+
 #endif

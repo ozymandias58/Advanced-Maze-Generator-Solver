@@ -7,7 +7,7 @@
 
 #include "MazeGenerator.h"
 
-#define INF 999999
+#define INF 999999 //sonsuzluga yakin yani
 #define STANDARDWEIGHT 1
 
 // The actual memory allocation for the variables declared in solver.h
@@ -26,13 +26,14 @@ int DJKexplored_size = 0;
 
 
 TestResult solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
-    TestResult res={"BFS",0,0};
+    TestResult res={"BFS", 0, 0, NULL, 0, NULL, 0, NULL, NULL};
+    int i;
     int totalCellCount= rows*collumns;
     BFSexplored_size=0;BFSresult_size=0;
     int* visited=(int*)safe_malloc(totalCellCount*sizeof(int));
-    for(int i=0; i<totalCellCount;i++) visited[i]=0; //hepsi 0
+    for(i=0; i<totalCellCount;i++) visited[i]=0; //hepsi 0
     int* parent = (int*)safe_malloc(totalCellCount * sizeof(int));
-    for(int i=0;i<totalCellCount;i++) parent[i]= -1; //hepsi -1
+    for(i=0;i<totalCellCount;i++) parent[i]= -1; //hepsi -1
     Kuyruk* q = createQueue(totalCellCount);
     visited[start]=1;
     enqueue(q,start);
@@ -55,12 +56,17 @@ TestResult solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
                 }
             }
     }
+        res.exploredCount=BFSexplored_size;
+        res.explored=(int*)safe_malloc(sizeof(int)*res.exploredCount);
+        for(i=0;i<res.exploredCount;i++){
+            res.explored[i]=BFSexplored[i].x * collumns + BFSexplored[i].y;
+        }
     if(foundFlag){ //bulundugu zaman yapılacak seyler
         int tempPath[90000];
         int temporary=end;
         int totalStepsCount=0;
         int totalWeight=0;
-        int i,p;
+        int p;
         while (temporary!=-1) {
             tempPath[totalStepsCount]=temporary;
             p=parent[temporary];
@@ -75,10 +81,14 @@ TestResult solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
         res.weight=totalWeight;
         BFSresult_size=totalStepsCount;
 
-        for(int i=0;i<totalStepsCount;i++){
+        for(i=0;i<totalStepsCount;i++){
             int vertexID=tempPath[totalStepsCount-1-i];
             BFSresult[i].x=vertexID/collumns; 
             BFSresult[i].y=vertexID%collumns;
+        }
+        res.result=(int*)safe_malloc(res.steps*sizeof(int));
+        for(i = 0; i < res.steps; i++) {
+            res.result[i] = tempPath[res.steps-1-i]; // Düz sıraya çevir
         }
     }
     free(visited);free(parent);freeQueue(q);
@@ -87,7 +97,7 @@ TestResult solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
     }
 
 TestResult solve_DFS(int start, int end, int rows, int collumns, int** AdjMatrix){
-    TestResult res={"DFS",0,0};
+    TestResult res={"DFS", 0, 0, NULL, 0, NULL, 0, NULL, NULL};
     int totalCellCount=rows*collumns;
     DFSexplored_size=0;DFSresult_size=0;
     int* visited = (int*)safe_malloc(totalCellCount*sizeof(int));
@@ -111,7 +121,7 @@ TestResult solve_DFS(int start, int end, int rows, int collumns, int** AdjMatrix
         }
         int neighbour;
         for(neighbour=0;neighbour<totalCellCount;neighbour++){
-            if(AdjMatrix[current][neighbour]==1&&!visited[neighbour]){
+            if(AdjMatrix[current][neighbour]>0&&!visited[neighbour]){
                 visited[neighbour]=1;
                 parent[neighbour]=current;
                 push(s,neighbour);
@@ -119,26 +129,43 @@ TestResult solve_DFS(int start, int end, int rows, int collumns, int** AdjMatrix
 
         }
     }
+    res.exploredCount=DFSexplored_size;
+    res.explored=(int*)safe_malloc(sizeof(int)*res.exploredCount);
+    for(i=0;i<res.exploredCount;i++) {
+        res.explored[i] = DFSexplored[i].x * collumns + DFSexplored[i].y;
+    }
     if(foundFlag){
         int tempPath[90000];
         int temporary=end;
-        int totalStepsCount=0;
+        int totalStepsCount=0,totalWeight=0,p;
         while (temporary!=-1) { //geriden baslayip en basa geliyorum cunku en bas -1 i gosteriyor
-            tempPath[totalStepsCount++]=temporary;
-            temporary=parent[temporary];            
+            tempPath[totalStepsCount]=temporary;
+            p=parent[temporary];
+            if(p!=-1){
+                totalWeight+=AdjMatrix[p][temporary];
+            }
+            totalStepsCount++;
+            temporary=p;
+
         }
         DFSresult_size=totalStepsCount;
-        for (int i=0;i<totalStepsCount;i++) {
+        for (i=0;i<totalStepsCount;i++) {
             int vertexID=tempPath[totalStepsCount-1-i];
             DFSresult[i].x=vertexID/collumns; 
             DFSresult[i].y=vertexID%collumns;
-        }      
-
+        }
+        res.steps = totalStepsCount;res.weight = totalWeight;res.resultCount = totalStepsCount;  
+        res.result=(int*)safe_malloc(sizeof(int)*res.steps);
+        for(i = 0; i < res.steps; i++) {
+            res.result[i] = tempPath[res.steps - 1 - i];
+        }    
     }
+
     free(visited);free(parent);freeStack(s);
+    return res;
 }
 TestResult solve_Dijkstra(int start, int end, int rows, int collumns, int** AdjMatrix) {
-    TestResult res ={"Dijkstra",0,0};
+    TestResult res ={"Dijkstra", 0, 0, NULL, 0, NULL, 0, NULL, NULL};
     int totalCellCount = rows*collumns;
     DJKexplored_size=0;DJKresult_size = 0;
     int i;
@@ -168,37 +195,64 @@ TestResult solve_Dijkstra(int start, int end, int rows, int collumns, int** AdjM
             foundFlag=1;
             break;
         }
-        int neighbour;
+        int neighbour,weight;
         for(neighbour=0;neighbour<totalCellCount;neighbour++){
-            if(AdjMatrix[currentVertex][neighbour]==1){
-            if (distance[currentVertex]+STANDARDWEIGHT<distance[neighbour]) {
-                    distance[neighbour] = distance[currentVertex] +STANDARDWEIGHT;
-                    parent[neighbour] = currentVertex;
-                    insert(distance[neighbour], neighbour); //yeni mesafeyi kuyruga ekle
+            weight=AdjMatrix[currentVertex][neighbour];
+            if(weight>0){
+                if(distance[currentVertex]+weight<distance[neighbour]){
+                    distance[neighbour]=distance[currentVertex]+weight;
+                    parent[neighbour]=currentVertex;
+                    insert(distance[neighbour],neighbour);
                 }
             }
         }
+    }
+    res.exploredCount=DJKexplored_size;
+    res.explored=(int*)safe_malloc(sizeof(int)*res.exploredCount);
+    for(i=0;i<res.exploredCount;i++){
+        res.explored[i] = DJKexplored[i].x * collumns + DJKexplored[i].y;
     }
 
     if(foundFlag){
         int tempPath[90000];
         int temporary=end;
-        int totalStepsCount=0;
+        int totalStepsCount=0,totalWeight=0 ;
+        int p;
         while (temporary!=-1) {
-            tempPath[totalStepsCount++]=temporary;
-            temporary=parent[temporary];            
+            tempPath[totalStepsCount]=temporary;
+            p=parent[temporary];
+            if(p!=-1){
+                totalWeight+=AdjMatrix[p][temporary];}
+            totalStepsCount++;
+            temporary=p;
         }
 
 
 
         DJKresult_size=totalStepsCount;
-        for (int i=0;i<totalStepsCount;i++) {
+        for (i=0;i<totalStepsCount;i++) {
             int vertexID = tempPath[totalStepsCount-1-i];
             DJKresult[i].x=vertexID/collumns; 
             DJKresult[i].y=vertexID%collumns;
         }
+        res.steps=totalStepsCount;
+        res.weight=totalWeight;
+        res.result = (int*)safe_malloc(sizeof(int) * res.steps);
+        for(i = 0; i < res.steps; i++) {
+            res.result[i] = tempPath[res.steps - 1 - i];
+        }
+
     }
     
     free(distance);free(parent);free(visited);freeHeap();
+    return res;
+}
+
+TestResult solve_Astar(int start, int end, int rows, int collumns, int** AdjMatrix){ //g(n):baslangictan su anki hücreye kadar harcanan enereji (ağırlıklar 1 ve 2 arasında değişiyor) h(n)=getPerpendicularDistance(dik uzaklığı alıyor),f(n):h(n)veg(n) toplamıdır
+    TestResult res={"Astar",0,0};
+    
+
+
+
     return res;
 }
