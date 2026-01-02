@@ -47,7 +47,7 @@ TestResult solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
             }
         int neighbour;
         for (int neighbor=0; neighbor < totalCellCount; neighbor++) { //tum komsulari dolaşıp daha once ziyaret edilmemis ve degeri 1 olanları quueue'ye al
-                if (AdjMatrix[current][neighbor] == 1 && !visited[neighbor]) {
+                if (AdjMatrix[current][neighbor]>0 && !visited[neighbor]) {
                     visited[neighbor] = 1;
                     parent[neighbor]=current;
                     enqueue(q,neighbor);
