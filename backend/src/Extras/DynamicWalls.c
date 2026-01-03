@@ -42,7 +42,7 @@ int DynamicWallDFS(int totalCells, int** adjMat, int src, int target) {
     return -1;
 }
 
-int initDynamicModule(MatrixUpdate* updates, int *updateIndex){
+void initDynamicModule(MatrixUpdate* updates, int *updateIndex){
     updates = (MatrixUpdate*)safe_malloc(10*sizeof(MatrixUpdate));
     *updateIndex = 0;
 }

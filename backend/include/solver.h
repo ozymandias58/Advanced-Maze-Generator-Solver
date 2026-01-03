@@ -5,8 +5,12 @@
 #include "testresult.h"
 
 #define DEFAULTSIZE 1000
-#define INF 999999 //sonsuzluga yakin yani
+#define INF 999999 //representing infinity
 #define COST 90000
+//Dynamic
+#define FREQUENCY 3
+#define DYNAMICUPDATESIZE 252
+#define DYNAMICINDEXSIZE 123
 
 typedef struct {
     int x;
@@ -40,6 +44,7 @@ extern int DJKexplored_size;
 extern Coordinate ASTexplored[DEFAULTSIZE];
 extern int ASTexplored_size;
 
+int applyTheDynamicChanges(int rows, int cols, int totalCells, int** adjMat, TestResult* res, int* updateIndex, int* changeIndex);
 
 TestResult solve_BFS(int start, int end, int rows, int columns, int** AdjMatrix);
 

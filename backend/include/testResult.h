@@ -3,7 +3,7 @@
 
 #include "DynamicWalls.h"
 
-typedef struct TestResult{
+typedef struct TestResult{//Guı a gonderilecek testResult yani res
     //GUI'de gözükecekler
     char* algo; //algoritmanın ismi
     int steps; //adım sayısı

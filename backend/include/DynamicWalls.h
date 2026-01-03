@@ -8,9 +8,9 @@ enum UPDATE{
 
 typedef struct MatrixUpdate{
     enum UPDATE update;
-    int u;
-    int v;
-    int w;
+    int u;//which cell
+    int v;//target cell
+    int w;//weight
 }MatrixUpdate;
 
 void DynamicSTKpush(int *stk, int v, int *top);
