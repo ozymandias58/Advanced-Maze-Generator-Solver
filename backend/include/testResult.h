@@ -17,6 +17,7 @@ typedef struct TestResult{//Guı a gonderilecek testResult yani res
     int resultCount;//result yolunda kaç hücre var
     int* dynamicChangeIndexes; //duvarın değiştiği turların sırası (YANİ BOYAMA YAPILIRKEN HANGİ ARALARDA DUVAR DEĞİŞSİN)
     MatrixUpdate* dynamicChangeUpdates; //Duvar değişeceğinde yapılan güncellemeler
+    int dynamicChangeCount;//kaç değişim oldu?
 
 }TestResult;
 

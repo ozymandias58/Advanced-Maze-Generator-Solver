@@ -17,6 +17,7 @@ typedef struct {
     int y;
 } Coordinate;
 
+extern int dynamicMode;//global variable to check if dynamic mode is enabled or not
 
 // Çözüm yolu (Karakterin BFS de yürüyeceği yol)
 extern Coordinate BFSresult[DEFAULTSIZE];
