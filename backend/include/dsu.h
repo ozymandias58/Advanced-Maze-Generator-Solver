@@ -8,7 +8,8 @@ typedef struct DSU{
 }DSU;
 
 void initDSU(DSU *d, int n);
-int find(DSU *d, int i);
-void unionSet(DSU *d, int u, int v);
 
+int find(DSU *d, int i);
+
+void unionSet(DSU *d, int u, int v);
 #endif

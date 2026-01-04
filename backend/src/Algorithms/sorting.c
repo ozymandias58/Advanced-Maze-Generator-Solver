@@ -8,6 +8,7 @@ void qsSwap(TestResult *a, TestResult *b){
     *a = *b;
     *b = t;
 }
+
 int qSortPartition(TestResult *arr, int start, int end){
     int pivot = end;
     int i = start-1;

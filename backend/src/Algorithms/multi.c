@@ -46,27 +46,36 @@ TestResult mergeFunction(TestResult res1,TestResult res2,TestResult res3){
 
 TestResult solve_MultiDest(int start,int dest1,int dest2,int dest3,int rows,int collumns,int** AdjMatrix,int algorithmType){
     TestResult res1,res2,res3;
+    int temp=dynamicMode;
     switch (algorithmType)
     {
     case 0:
         res1=solve_BFS(start,dest1,rows,collumns,AdjMatrix);
+        dynamicMode=0;
         res2=solve_BFS(start,dest2,rows,collumns,AdjMatrix);
         res3=solve_BFS(start,dest3,rows,collumns,AdjMatrix);
+        dynamicMode=temp;
         break;
     case 1:
         res1=solve_DFS(start,dest1,rows,collumns,AdjMatrix);
+        dynamicMode=0;
         res2=solve_DFS(start,dest2,rows,collumns,AdjMatrix);
         res3=solve_DFS(start,dest3,rows,collumns,AdjMatrix);
+        dynamicMode=temp;
         break;
     case 2:
         res1=solve_Dijkstra(start,dest1,rows,collumns,AdjMatrix);
+        dynamicMode=0;
         res2=solve_Dijkstra(start,dest2,rows,collumns,AdjMatrix);
         res3=solve_Dijkstra(start,dest3,rows,collumns,AdjMatrix);
+        dynamicMode=temp;
         break;
     case 3:
         res1=solve_Astar(start,dest1,rows,collumns,AdjMatrix);
+        dynamicMode=0;
         res2=solve_Astar(start,dest2,rows,collumns,AdjMatrix);
         res3=solve_Astar(start,dest3,rows,collumns,AdjMatrix);
+        dynamicMode=temp;
         break;
     default:
         break;

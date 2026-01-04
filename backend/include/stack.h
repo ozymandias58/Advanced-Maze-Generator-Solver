@@ -6,7 +6,6 @@ typedef struct stack{// stack struct
     int* data;
     int capacity;
 }Stack;
-
 Stack* createStack(int capacity);//stack olustur
 int isEmptyS(Stack* s) ;//stack bos mu?
 void freeStack(Stack* s) ;//stacki free yap

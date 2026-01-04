@@ -1,6 +1,5 @@
 #ifndef MAZE_GENERATOR_H
 #define MAZE_GENERATOR_H
-
 #include <stdio.h>
 
 typedef struct edge{ //kenar edge yani

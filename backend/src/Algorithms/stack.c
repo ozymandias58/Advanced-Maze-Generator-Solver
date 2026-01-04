@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "stack.h"
 #include "MazeGenerator.h"
+
 #define MULTIPLICATIONNUMBER 2
 
 Stack* createStack(int capacity){

@@ -8,6 +8,7 @@ Kuyruk* createQueue(int capacity){
     k->front=0;k->rear=0;k->elementCount=0;
     k->capacity=capacity;
     k->data=(int*)safe_malloc(sizeof(int) * capacity);
+    
     return k;
 }
 int isEmptyQ(Kuyruk* k) {
@@ -36,5 +37,6 @@ int dequeue(Kuyruk* k) {
     int sayi = k->data[k->front];
     k->front++;
     k->elementCount--;
+
     return sayi;
 }
