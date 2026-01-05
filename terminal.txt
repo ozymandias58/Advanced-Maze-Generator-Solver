@@ -1,0 +1,6 @@
+cd "C:\Users\Dysarx\Desktop\Files\Advanced-Maze-Generator-Solver"
+$files = Get-ChildItem -Path backend\src -Recurse -Filter *.c | Select-Object -ExpandProperty FullName
+gcc -I backend\include $files -o frontend\src\Demo.exe
+cd frontend\src
+javac MazeApp.java
+java MazeApp

@@ -74,41 +74,48 @@ int* weightGenerator(int totalEdgeCount){
     return edgeWeights;
 }
 
-void initWalls(edge **wallList, int rows, int cols, int option_weight){
+void initWalls(edge **wallList, int rows, int cols, int option_weight) {
     int wallCount = (rows * (cols - 1)) + (cols * (rows - 1));
+    *wallList = (edge*)safe_malloc(sizeof(edge) * wallCount);
 
-    *wallList = (edge*)safe_malloc(sizeof(edge)*wallCount);
-
-    //weight option
-    int* edgeWeights;
-    if(option_weight)
+    // DÜZELTME: Pointer'ı NULL başlatıyoruz ki kaza çıkmasın
+    int* edgeWeights = NULL; 
+    
+    if (option_weight) {
         edgeWeights = weightGenerator(wallCount);
+    }
 
     int idx = 0;
-    for(int r=0; r<rows; r++){
-        for(int c=0; c<cols; c++){
+    for(int r = 0; r < rows; r++) {
+        for(int c = 0; c < cols; c++) {
             int cur_cell = c + (r * cols);
-
-            if(c < cols-1){ //is there a right?
+            
+            // Sağ Duvar
+            if(c < cols - 1) { 
                 edge wall;
                 wall.u = cur_cell;
                 wall.v = cur_cell + 1;
-                if(option_weight) wall.w = edgeWeights[idx];
+                if (option_weight && edgeWeights != NULL) wall.w = edgeWeights[idx];
                 else wall.w = 1;
                 (*wallList)[idx++] = wall;
             }
-
-            if(r < rows-1){ //is there a down?
+            
+            // Alt Duvar
+            if(r < rows - 1) { 
                 edge wall;
                 wall.u = cur_cell;
                 wall.v = cur_cell + cols;
-                if(option_weight) wall.w = edgeWeights[idx];
+                if (option_weight && edgeWeights != NULL) wall.w = edgeWeights[idx];
                 else wall.w = 1;
                 (*wallList)[idx++] = wall;
             }
         }
     }
-    free(edgeWeights);
+
+    // DÜZELTME: Sadece doluysa boşalt!
+    if (edgeWeights != NULL) {
+        free(edgeWeights);
+    }
 }
 
 //Knocks walls one by one until each vertice is connected
