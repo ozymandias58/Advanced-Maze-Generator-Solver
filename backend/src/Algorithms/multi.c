@@ -1,64 +1,93 @@
-#include "multi.h"
-#include "solver.h"
-#include "MazeGenerator.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include "solver.h"
+#include "MazeGenerator.h"
 
-int findMax(int a, int b) { return (a > b ? a : b); }
+int findMax(int a,int b){ return (a>b?a:b);}//returns the maximum value (stole this from here https://www.geeksforgeeks.org/c/c-program-to-find-the-largest-number-among-three-numbers/)
 
-TestResult mergeFunction(TestResult res1, TestResult res2, TestResult res3) {
+TestResult mergeFunction(TestResult res1,TestResult res2,TestResult res3){
     TestResult finalRes;
-    finalRes.steps = res1.steps + res2.steps + res3.steps;
-    finalRes.weight = res1.weight + res2.weight + res3.weight;
-    finalRes.exploredCount = res1.exploredCount + res2.exploredCount + res3.exploredCount;
-    finalRes.resultCount = res1.resultCount + res2.resultCount + res3.resultCount;
-    finalRes.dynamicChangeCount = res1.dynamicChangeCount + res2.dynamicChangeCount + res3.dynamicChangeCount;
+    finalRes.resultCount=res1.resultCount+res2.resultCount+res3.resultCount;
+    finalRes.exploredCount=res1.exploredCount+res2.exploredCount+res3.exploredCount;
+    finalRes.steps=res1.steps+res2.steps+res3.steps;
+    finalRes.weight=res1.weight+res2.weight+res3.weight;
+    finalRes.result=(int*)safe_malloc(finalRes.resultCount*sizeof(int));
+    finalRes.explored=(int*)safe_malloc(finalRes.exploredCount*sizeof(int));
+    finalRes.dynamicChangeIndexes=(int*)safe_malloc(DYNAMICINDEXSIZE*sizeof(int));
+    finalRes.dynamicChangeUpdates=(MatrixUpdate*)safe_malloc(DYNAMICUPDATESIZE*sizeof(MatrixUpdate));
+    finalRes.dynamicChangeCount=res1.dynamicChangeCount;
 
-    finalRes.explored = (int*)malloc(finalRes.exploredCount * sizeof(int));
-    finalRes.result = (int*)malloc(finalRes.resultCount * sizeof(int));
-    finalRes.dynamicChangeUpdates = (MatrixUpdate*)malloc(sizeof(MatrixUpdate) * (finalRes.dynamicChangeCount + 1));
-    finalRes.dynamicChangeIndexes = (int*)malloc(sizeof(int) * (finalRes.dynamicChangeCount + 1));
+    int exploredMax=findMax(res1.exploredCount,findMax(res2.exploredCount,res3.exploredCount));
+    int resultMax=findMax(res1.resultCount,findMax(res2.resultCount,res3.resultCount));
+    int finalExploredPosition=0,finalResultPosition=0,i;
 
-    int expIdx = 0, resIdx = 0, dynIdx = 0;
-
-    // 1. Bölüm
-    for(int i=0; i<res1.exploredCount; i++) finalRes.explored[expIdx++] = res1.explored[i];
-    for(int i=0; i<res1.resultCount; i++) finalRes.result[resIdx++] = res1.result[i];
-    for(int i=0; i<res1.dynamicChangeCount; i++) finalRes.dynamicChangeUpdates[dynIdx++] = res1.dynamicChangeUpdates[i];
-
-    // 2. Bölüm
-    for(int i=0; i<res2.exploredCount; i++) finalRes.explored[expIdx++] = res2.explored[i];
-    for(int i=0; i<res2.resultCount; i++) finalRes.result[resIdx++] = res2.result[i];
-    for(int i=0; i<res2.dynamicChangeCount; i++) finalRes.dynamicChangeUpdates[dynIdx++] = res2.dynamicChangeUpdates[i];
-
-    // 3. Bölüm
-    for(int i=0; i<res3.exploredCount; i++) finalRes.explored[expIdx++] = res3.explored[i];
-    for(int i=0; i<res3.resultCount; i++) finalRes.result[resIdx++] = res3.result[i];
-    for(int i=0; i<res3.dynamicChangeCount; i++) finalRes.dynamicChangeUpdates[dynIdx++] = res3.dynamicChangeUpdates[i];
-
+    for(i=0;i<exploredMax;i++){
+        if(i<res1.exploredCount)
+            finalRes.explored[finalExploredPosition++]=res1.explored[i];        
+        if(i<res2.exploredCount)
+            finalRes.explored[finalExploredPosition++]=res2.explored[i];        
+        if(i<res3.exploredCount)
+            finalRes.explored[finalExploredPosition++]=res3.explored[i];
+    }
+    for(i=0;i<resultMax;i++){
+        if(i<res1.resultCount)
+            finalRes.result[finalResultPosition++]=res1.result[i];
+        if(i<res2.resultCount)
+            finalRes.result[finalResultPosition++]=res2.result[i];
+        if(i<res3.resultCount)
+            finalRes.result[finalResultPosition++]=res3.result[i];
+    }
+    for(i=0;i<res1.dynamicChangeCount;i++) {
+        finalRes.dynamicChangeUpdates[i]=res1.dynamicChangeUpdates[i];
+        finalRes.dynamicChangeIndexes[i]=res1.dynamicChangeIndexes[i];
+    }
     return finalRes;
 }
 
-TestResult solve_MultiDest(int start, int dest1, int dest2, int dest3, int rows, int collumns, int** AdjMatrix, int algorithmType) {
-    TestResult res1, res2, res3;
-    // Zincirleme Rota: Start->D1, D1->D2, D2->End
-    if (algorithmType == 1) { // DFS
-        res1 = solve_DFS(start, dest1, rows, collumns, AdjMatrix);
-        res2 = solve_DFS(dest1, dest2, rows, collumns, AdjMatrix);
-        res3 = solve_DFS(dest2, dest3, rows, collumns, AdjMatrix);
-    } else if (algorithmType == 2) { // Dijkstra
-        res1 = solve_Dijkstra(start, dest1, rows, collumns, AdjMatrix);
-        res2 = solve_Dijkstra(dest1, dest2, rows, collumns, AdjMatrix);
-        res3 = solve_Dijkstra(dest2, dest3, rows, collumns, AdjMatrix);
-    } else if (algorithmType == 3) { // A*
-        res1 = solve_Astar(start, dest1, rows, collumns, AdjMatrix);
-        res2 = solve_Astar(dest1, dest2, rows, collumns, AdjMatrix);
-        res3 = solve_Astar(dest2, dest3, rows, collumns, AdjMatrix);
-    } else { // BFS
-        res1 = solve_BFS(start, dest1, rows, collumns, AdjMatrix);
-        res2 = solve_BFS(dest1, dest2, rows, collumns, AdjMatrix);
-        res3 = solve_BFS(dest2, dest3, rows, collumns, AdjMatrix);
+TestResult solve_MultiDest(int start,int dest1,int dest2,int dest3,int rows,int collumns,int** AdjMatrix,int algorithmType){
+    TestResult res1,res2,res3;
+    int temp=dynamicMode;
+    switch (algorithmType)
+    {
+    case 0:
+        res1=solve_BFS(start,dest1,rows,collumns,AdjMatrix);
+        dynamicMode=0;
+        res2=solve_BFS(start,dest2,rows,collumns,AdjMatrix);
+        res3=solve_BFS(start,dest3,rows,collumns,AdjMatrix);
+        dynamicMode=temp;
+        break;
+    case 1:
+        res1=solve_DFS(start,dest1,rows,collumns,AdjMatrix);
+        dynamicMode=0;
+        res2=solve_DFS(start,dest2,rows,collumns,AdjMatrix);
+        res3=solve_DFS(start,dest3,rows,collumns,AdjMatrix);
+        dynamicMode=temp;
+        break;
+    case 2:
+        res1=solve_Dijkstra(start,dest1,rows,collumns,AdjMatrix);
+        dynamicMode=0;
+        res2=solve_Dijkstra(start,dest2,rows,collumns,AdjMatrix);
+        res3=solve_Dijkstra(start,dest3,rows,collumns,AdjMatrix);
+        dynamicMode=temp;
+        break;
+    case 3:
+        res1=solve_Astar(start,dest1,rows,collumns,AdjMatrix);
+        dynamicMode=0;
+        res2=solve_Astar(start,dest2,rows,collumns,AdjMatrix);
+        res3=solve_Astar(start,dest3,rows,collumns,AdjMatrix);
+        dynamicMode=temp;
+        break;
+    default:
+        break;
     }
-    return mergeFunction(res1, res2, res3);
+    TestResult finalResult=mergeFunction(res1,res2,res3);
+    finalResult.algo=res1.algo;
+    free(res1.result);free(res1.explored);
+    free(res1.dynamicChangeIndexes);free(res1.dynamicChangeUpdates);
+    free(res2.result);free(res2.explored);
+    free(res2.dynamicChangeIndexes);free(res2.dynamicChangeUpdates);
+    free(res3.result);free(res3.explored);
+    free(res3.dynamicChangeIndexes);free(res3.dynamicChangeUpdates);
+    
+    return finalResult;
 }
