@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 void saveJSONtoFile(cJSON* obj){
-    char *renderedJSON = cJSON_Print(obj); //convert json to string
+    char *renderedJSON = cJSON_PrintUnformatted(obj); //convert json to string
 
     //unique name based on time
     time_t now = time(NULL);
@@ -68,7 +68,7 @@ void createJSON(int **adjMat,int rows, int cols, TestResult* testArr, int testSi
     saveJSONtoFile(root);
 }
 
-cJSON* get_json_from_file(char *filename) {
+cJSON* getJSONFromFile(char *filename) {
     FILE *file = fopen(filename, "rb");
     if (file == NULL) {
         return NULL;
@@ -107,4 +107,69 @@ cJSON* get_json_from_file(char *filename) {
     }
 
     return root;
+}
+
+void readFromJSON(cJSON *root, int **adjmat, int rows, int cols, TestResult** testArr, int* testArrSize, int* option_weight, int* option_dynamic, int* option_multi){
+    cJSON *options = cJSON_GetObjectItem(root, "options");
+    if(cJSON_IsObject(options)){
+        *option_weight = cJSON_GetObjectItem(options, "weight")->valueint;
+        *option_dynamic = cJSON_GetObjectItem(options, "dynamic")->valueint;
+        *option_multi = cJSON_GetObjectItem(options, "multi")->valueint;
+    }
+
+    int totalCells = rows * cols;
+
+    cJSON *graph = cJSON_GetObjectItem(root, "graph");
+    if(cJSON_IsArray(graph)){
+        for(int i = 0; i < totalCells; i++){
+            cJSON *row = cJSON_GetArrayItem(graph, i);
+            for(int j = 0; j < totalCells; j++){
+                adjmat[i][j] = cJSON_GetArrayItem(row, j)->valueint;
+            }
+        }
+    }
+
+    cJSON *tests = cJSON_GetObjectItem(root, "tests");
+    if(cJSON_IsArray(tests)){
+        *testArrSize = cJSON_GetArraySize(tests);
+        
+        *testArr = (TestResult*)malloc(sizeof(TestResult) * (*testArrSize));
+
+        for(int i = 0; i < *testArrSize; i++){
+            cJSON *item = cJSON_GetArrayItem(tests, i);
+            TestResult *t = &((*testArr)[i]);
+
+            t->algo = strdup(cJSON_GetObjectItem(item, "name")->valuestring);
+            t->steps = cJSON_GetObjectItem(item, "steps")->valueint;
+            t->weight = cJSON_GetObjectItem(item, "weight")->valueint;
+
+            t->exploredCount = cJSON_GetObjectItem(item, "exploredSize")->valueint;
+            t->explored = (int*)malloc(sizeof(int) * t->exploredCount);
+            cJSON *explJson = cJSON_GetObjectItem(item, "explored");
+            for(int j = 0; j < t->exploredCount; j++){
+                t->explored[j] = cJSON_GetArrayItem(explJson, j)->valueint;
+            }
+
+            t->resultCount = cJSON_GetObjectItem(item, "pathSize")->valueint;
+            t->result = (int*)malloc(sizeof(int) * t->resultCount);
+            cJSON *pathJson = cJSON_GetObjectItem(item, "path");
+            for(int j = 0; j < t->resultCount; j++){
+                t->result[j] = cJSON_GetArrayItem(pathJson, j)->valueint;
+            }
+        }
+    }
+}
+
+void freeTestResults(TestResult* testArr, int testSize) {
+    if (testArr == NULL) return;
+
+    for (int i = 0; i < testSize; i++) {
+        if (testArr[i].algo) free(testArr[i].algo);
+
+        if (testArr[i].explored) free(testArr[i].explored);
+        if (testArr[i].result) free(testArr[i].result);
+        
+    }
+
+    free(testArr);
 }
