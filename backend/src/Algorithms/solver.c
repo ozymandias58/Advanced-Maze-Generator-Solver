@@ -233,6 +233,11 @@ TestResult solve_Dijkstra(int start, int end, int rows, int collumns, int** AdjM
     while(h.size>0){
         PQNode currentNode=extract();
         int currentVertex=currentNode.vertex;
+        int p = parent[currentVertex];
+        if (p != -1 && AdjMatrix[p][currentVertex] == 0) {
+            continue; 
+        }
+        
         if (visited[currentVertex]==1) 
             continue;//zaten ziyaret edilmisse while ı en bastan baslat
         visited[currentVertex]=1;
@@ -327,6 +332,10 @@ TestResult solve_Astar(int start, int end, int rows, int collumns, int** AdjMatr
     while(h.size>0){
         PQNode currentPQNode=extract();
         int current=currentPQNode.vertex;
+        int p = parent[current];
+        if (p != -1 && AdjMatrix[p][current] == 0) {
+            continue; 
+        }
         if(visited[current]==1) continue;
         visited[current]=1;
         ASTexplored[ASTexplored_size].x = current / collumns;
