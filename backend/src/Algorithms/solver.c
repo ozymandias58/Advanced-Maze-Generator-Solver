@@ -26,18 +26,18 @@ Coordinate ASTexplored[DEFAULTSIZE];
 int ASTexplored_size = 0;
 int dynamicMode = 0;//global variable to check if dynamic mode is enabled or not
 
-int applyTheDynamicChanges(int rows, int cols, int totalCells, int** adjMat, TestResult* res, int* updateIndex, int* changeIndex) {
+int applyTheDynamicChanges(int rows, int cols, int totalCells, int** adjMat, TestResult* res, int* updateIndex, int* changeIndex, int* parent, int current) {
     if (!dynamicMode) return -1;
     if (*updateIndex >= DYNAMICUPDATESIZE - 2) return -1;
-    int u = DynamicWallChange(rows, cols, totalCells, adjMat, res->dynamicChangeUpdates, updateIndex);
-    if(u!=-1){
+
+    int u = DynamicWallChange(rows, cols, totalCells, adjMat, res->dynamicChangeUpdates, updateIndex, parent, current);
+    
+    if (u != -1) {
         res->dynamicChangeIndexes[*changeIndex] = res->exploredCount;
         (*changeIndex)++;
     }
-    /*MatrixUpdate up1 = res->dynamicChangeUpdates[(*updateIndex)-2];
-    MatrixUpdate up2 = res->dynamicChangeUpdates[(*updateIndex)-1];*/
-    return u; // Duvarı değişen hücreyi döndürüyor
-}   
+    return u;
+}
 
 TestResult solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
     TestResult res={"BFS", 0, 0, NULL, 0, NULL, 0, NULL, NULL,0};
@@ -57,6 +57,7 @@ TestResult solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
     res.dynamicChangeIndexes=(int*)safe_malloc(sizeof(int)*DYNAMICINDEXSIZE);//en kotu ihtimal 400/5 değişim olur yani 80 ben 100 koydum garanti olsun diye
     while(!isEmptyQ(q)){
         int current=dequeue(q);
+  
         int p=parent[current];
         if (p != -1 && AdjMatrix[p][current] == 0) { // Eğer başlangıç değilse ve geldiği yol artk duvarsa
             visited[current] = 0; // Bu yolu geçersiz say ve hücreyi tekrar aç
@@ -66,24 +67,8 @@ TestResult solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
         BFSexplored[BFSexplored_size].y=current%collumns;
         res.exploredCount = ++BFSexplored_size;
         if(dynamicMode&&res.exploredCount%frequency==0){
-            u=applyTheDynamicChanges(rows, collumns, totalCellCount, AdjMatrix, &res, &updateIndex, &changeIndex);
-            if (u != -1) {
-                MatrixUpdate addUp = res.dynamicChangeUpdates[updateIndex-1];
-                int nodeU = addUp.u;
-                int nodeV = addUp.v;
-                visited[nodeU] = 0;
-                visited[nodeV] = 0;
-                enqueue(q, nodeU);
-                enqueue(q, nodeV);
-/*                for (i = 0; i < totalCellCount; i++) {
-                    if (AdjMatrix[u][i] > 0 && !visited[i]) {
-                        visited[i] = 1;
-                        parent[i] = u;
-                        enqueue(q, i); 
-                    }
-                }*/
-            }
-        }
+            u = applyTheDynamicChanges(rows, collumns, totalCellCount, AdjMatrix, &res, &updateIndex, &changeIndex, parent, current);
+    }
         if (current==end) {
                 foundFlag=1;
                 break;
@@ -168,23 +153,7 @@ TestResult solve_DFS(int start, int end, int rows, int collumns, int** AdjMatrix
         
         res.exploredCount= ++DFSexplored_size;
         if (dynamicMode&&res.exploredCount % frequency == 0) {
-            u=applyTheDynamicChanges(rows, collumns, totalCellCount, AdjMatrix, &res, &updateIndex, &changeIndex);
-            if(u!=-1){
-                MatrixUpdate addUp = res.dynamicChangeUpdates[updateIndex-1];
-                int nodeU = addUp.u;
-                int nodeV = addUp.v;
-                visited[nodeU] = 0;
-                visited[nodeV] = 0;
-                push(s, nodeU);
-                push(s, nodeV);
-                /*for (i = 0; i< totalCellCount; i++) {
-                    if (AdjMatrix[u][i] > 0 && !visited[i]) {
-                        visited[i] = 1;
-                        parent[i] = u;
-                        push(s, i);
-                    }
-                }*/
-            }
+            u = applyTheDynamicChanges(rows, collumns, totalCellCount, AdjMatrix, &res, &updateIndex, &changeIndex, parent, current);
         }
         if(current == end){
             foundFlag = 1; // Bu satır olmazsa res.result dolmaz!
@@ -272,22 +241,7 @@ TestResult solve_Dijkstra(int start, int end, int rows, int collumns, int** AdjM
         DJKexplored_size++;
         res.exploredCount = DJKexplored_size;
         if(dynamicMode&&res.exploredCount>0&&res.exploredCount%frequency==0){
-            int dynamicChangedCell=applyTheDynamicChanges(rows,collumns,totalCellCount,AdjMatrix,&res,&updateIndex,&changeIndex);
-            if(dynamicChangedCell!=-1&&visited[dynamicChangedCell]){
-                for(neighbour=0;neighbour<totalCellCount;neighbour++){//check neighbours of changed cell
-                    int weight=AdjMatrix[dynamicChangedCell][neighbour];
-                    if(weight>0){//is it a wall?
-                        if(distance[dynamicChangedCell]+weight<distance[neighbour]){//if changed cells weight and neighbours weight is smallrer than neighbours apply it to neighbour
-                            distance[neighbour]=distance[dynamicChangedCell]+weight;
-                            parent[neighbour]=dynamicChangedCell;//parentini ayarla geri gitmek kolay olsun
-                            insert(distance[neighbour],neighbour);
-                            visited[neighbour]=0;
-                        }
-                    }
-
-                }
-            }
-
+            int dynamicChangedCell=applyTheDynamicChanges(rows, collumns, totalCellCount, AdjMatrix, &res, &updateIndex, &changeIndex, parent, currentVertex);
         }
         if (currentVertex == end) {
             foundFlag=1;
@@ -381,21 +335,7 @@ TestResult solve_Astar(int start, int end, int rows, int collumns, int** AdjMatr
         res.exploredCount=ASTexplored_size;
 
         if(dynamicMode&&res.exploredCount>0&&res.exploredCount%frequency==0){
-            int dynamicChangedCell=applyTheDynamicChanges(rows, collumns, totalCellCount, AdjMatrix, &res, &updateIndex, &changeIndex);
-            if(dynamicChangedCell!=-1&&visited[dynamicChangedCell]){
-                for(neighbour=0;neighbour<totalCellCount;neighbour++){
-                    int weight=AdjMatrix[dynamicChangedCell][neighbour];
-                    if(weight>0){
-                        if(realCost[dynamicChangedCell]+weight<realCost[neighbour]){
-                            realCost[neighbour]=realCost[dynamicChangedCell]+weight;
-                            parent[neighbour]=dynamicChangedCell;
-                            int finalScore =realCost[neighbour]+getPerpendicularDistance(neighbour,end,collumns);
-                            insert(finalScore,neighbour);
-                            visited[neighbour]=0;
-                        }
-                    }
-                }
-            }
+            int dynamicChangedCell=applyTheDynamicChanges(rows, collumns, totalCellCount, AdjMatrix, &res, &updateIndex, &changeIndex, parent, current);
         }
 
         if(current==end){

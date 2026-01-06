@@ -3,7 +3,7 @@
 
 #include "DynamicWalls.h"
 
-typedef struct TestResult{//Guı a gonderilecek testResult yani res
+typedef struct TestResult{//GUI'ye gonderilecek testResult yani res
     //GUI'de gözükecekler
     char* algo; //algoritmanın ismi
     int steps; //adım sayısı
@@ -11,13 +11,13 @@ typedef struct TestResult{//Guı a gonderilecek testResult yani res
 
 
     //GUI'ye gönderilecekler
-    int* explored; //keşfetme sırası (gui için boyama sırası)
+    int* explored; //keşfetme sırası
     int exploredCount;//kaç hücre keşfedildi
     int* result; //bulunan yolun sırası
     int resultCount;//result yolunda kaç hücre var
-    int* dynamicChangeIndexes; //duvarın değiştiği turların sırası (YANİ BOYAMA YAPILIRKEN HANGİ ARALARDA DUVAR DEĞİŞSİN)
+    int* dynamicChangeIndexes; //duvarın değiştiği turların sırası
     MatrixUpdate* dynamicChangeUpdates; //Duvar değişeceğinde yapılan güncellemeler
-    int dynamicChangeCount;//kaç değişim oldu?
+    int dynamicChangeCount;//değişim sayısı
 
 }TestResult;
 
