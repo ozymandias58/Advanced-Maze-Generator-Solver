@@ -3,7 +3,7 @@
 #include "solver.h"
 #include "MazeGenerator.h"
 
-int findMax(int a,int b){ return (a>b?a:b);}//returns the maximum value
+int findMax(int a,int b){ return (a>b?a:b);}//returns the maximum value (stole this from here https://www.geeksforgeeks.org/c/c-program-to-find-the-largest-number-among-three-numbers/)
 
 TestResult mergeFunction(TestResult res1,TestResult res2,TestResult res3){
     TestResult finalRes;
