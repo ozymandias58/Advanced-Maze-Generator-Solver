@@ -54,7 +54,7 @@ MatrixUpdate* initDynamicModule(int *updateIndex){
     return updates;
 }
 
-int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUpdate* updates, int *updateIndex) {
+int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUpdate* updates, int *updateIndex,int* visited) {
     //find 1 possible new connection (that node is v)
     //find a path from v to u through dfs (last is n)
     //sever the n-u
@@ -65,12 +65,12 @@ int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUp
     int u = -1, v = -1,attempt=0;;
     
     // find a potential v
-    while(u == -1&&attempt<100) {
+    while(u == -1&&attempt<150) {
         attempt++;
         int r = rand() % rows;
         int c = rand() % cols;
         u = c + (r * cols);
-        
+
 
         int dir = rand() % 4;
         int nr = r, nc = c;
@@ -81,13 +81,17 @@ int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUp
 
         if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
             v = nc + (nr * cols);
+            if (visited[u] == 1 || visited[v] == 1) {
+                u = -1;
+                continue;
+            }
             if (adjMat[u][v] == 0) {
                 break;
             }
         }
         u = -1;
     }
-
+    if(u == -1) return -1;
     // find path from v to u to find n
     int n = DynamicWallDFS(totalCells, adjMat, v, u);
 

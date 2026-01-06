@@ -16,6 +16,6 @@ void DynamicSTKpush(int *stk, int v, int *top);
 int DynamicSTKpop(int *stk, int *top);
 int DynamicWallDFS(int totalCells, int **adjMat, int src, int target);
 MatrixUpdate* initDynamicModule(int *updateIndex); //call this first. It initializes 10 updates
-int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUpdate *updates, int *updateIndex); //eğer return ettiği ziyaretimize komşuysa onu da queue stack heap falan ekle
+int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUpdate* updates, int *updateIndex,int* visited);
 
 #endif

@@ -5,6 +5,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
+#include <string.h>
 
 void saveJSONtoFile(cJSON* obj){
     char *renderedJSON = cJSON_PrintUnformatted(obj); //convert json to string
