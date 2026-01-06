@@ -19,6 +19,19 @@ int DynamicSTKpop(int *stk, int *top) {
     return stk[(*top)--];
 }
 
+int isEdgeProtected(int u, int n, int* parent, int current) {
+    int temp = current;
+    while (temp != -1) {
+        int p = parent[temp];
+        // u,n kenarı p,temp kenarı ile aynıysa korunuyor
+        if ((u == p && n == temp) || (u == temp && n == p)) {
+            return 1; 
+        }
+        temp = p;
+    }
+    return 0;
+}
+
 int DynamicWallDFS(int totalCells, int** adjMat, int src, int target) {
 
     int* stk = (int*)malloc(sizeof(int) * totalCells);
@@ -54,7 +67,7 @@ MatrixUpdate* initDynamicModule(int *updateIndex){
     return updates;
 }
 
-int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUpdate* updates, int *updateIndex,int* visited) {
+int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUpdate* updates, int *updateIndex,int *parent, int current) {
     //find 1 possible new connection (that node is v)
     //find a path from v to u through dfs (last is n)
     //sever the n-u
@@ -65,12 +78,12 @@ int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUp
     int u = -1, v = -1,attempt=0;;
     
     // find a potential v
-    while(u == -1&&attempt<150) {
+    while(u == -1&&attempt<100) {
         attempt++;
         int r = rand() % rows;
         int c = rand() % cols;
         u = c + (r * cols);
-
+        
 
         int dir = rand() % 4;
         int nr = r, nc = c;
@@ -81,21 +94,21 @@ int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUp
 
         if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
             v = nc + (nr * cols);
-            if (visited[u] == 1 || visited[v] == 1) {
-                u = -1;
-                continue;
-            }
             if (adjMat[u][v] == 0) {
                 break;
             }
         }
         u = -1;
     }
-    if(u == -1) return -1;
+
     // find path from v to u to find n
     int n = DynamicWallDFS(totalCells, adjMat, v, u);
 
     if (n != -1&&(*updateIndex)<198) {
+        if (isEdgeProtected(u, n, parent, current)) {
+        return -1; //bu güncelleme yolu değiştirmeye çalıştı
+        }
+
         //sever n-u and connect v-u
         int temp_w = adjMat[u][n];
         if(temp_w==0) temp_w=1;
