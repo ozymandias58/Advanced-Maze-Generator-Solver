@@ -40,6 +40,7 @@ public class MazeApp extends JFrame {
     private List<Point> heavyConnections = new ArrayList<>(); 
     private List<Integer> visitedNodes = new ArrayList<>();
     private List<Integer> finalPath = new ArrayList<>();
+    private List<String> dynamicWallQueue = new ArrayList<>();
     
     private List<Integer> currentAnimatedVisits = new ArrayList<>();
     private List<Integer> currentAnimatedPath = new ArrayList<>();
@@ -358,13 +359,15 @@ public class MazeApp extends JFrame {
             else if(line.startsWith("STEPS:")) { lastSteps = Integer.parseInt(line.split(":")[1].trim()); resultsArea.append("Adım: " + lastSteps + "\n"); }
             else if(line.startsWith("WEIGHT:")) { lastWeight = Integer.parseInt(line.split(":")[1].trim()); resultsArea.append("Ağırlık: " + lastWeight + "\n"); }
             else if(line.startsWith("DYNA:")) { // Dinamik Duvar
-                String[] vals = line.split(":")[1].trim().split("\\s+");
+                dynamicWallQueue.add(line.split(":")[1].trim());
+
+               /*String[] vals = line.split(":")[1].trim().split("\\s+");
                 int u = Integer.parseInt(vals[0]); int v = Integer.parseInt(vals[1]); int w = Integer.parseInt(vals[2]);
                 connections.removeIf(p -> (p.x==u && p.y==v) || (p.x==v && p.y==u));
                 heavyConnections.removeIf(p -> (p.x==u && p.y==v) || (p.x==v && p.y==u));
                 if(w == 1) connections.add(new Point(u, v)); else if(w >= 2) heavyConnections.add(new Point(u, v));
                 mazeCanvas.repaint();
-                resultsArea.append("Dinamik Duvar: " + u + "-" + v + "\n");
+                resultsArea.append("Dinamik Duvar: " + u + "-" + v + "\n"); */
             }
             else if(line.startsWith("MATRIX:")) {
                 String[] vals = line.split(":")[1].trim().split("\\s+");
@@ -380,14 +383,42 @@ public class MazeApp extends JFrame {
             else if(line.startsWith("RESULT:")) for(String s:line.substring(7).trim().split("\\s+")) finalPath.add(Integer.parseInt(s));
         } catch(Exception e) {}
     }
+    private void processDynamicWall(String data){
+        try{
+            String[] vals =data.split("\\s+");
+            int u = Integer.parseInt(vals[0]);
+            int v = Integer.parseInt(vals[1]);
+            int w = Integer.parseInt(vals[2]);
+            connections.removeIf(p -> (p.x == u && p.y == v) || (p.x == v && p.y == u)); //duvarı temizle
+            heavyConnections.removeIf(p -> (p.x == u && p.y == v) || (p.x == v && p.y == u));
+            if(w==1)
+                connections.add(new Point(u,v));
+            else if(w>=2)
+                heavyConnections.add(new Point(u, v));
+        resultsArea.append(">> Dinamik Engel Değişti: " + u + "-" + v + " (W:" + w + ")\n");
+        } catch (Exception e) {}
+    }
 
     private void startAnimation() {
         if(visitedNodes.isEmpty()) return;
         animationTimer = new Timer(10, e -> {
             for(int i=0; i<5; i++) {
-                if(animationIndex < visitedNodes.size()) currentAnimatedVisits.add(visitedNodes.get(animationIndex++));
-                else if(pathIndex < finalPath.size()) currentAnimatedPath.add(finalPath.get(pathIndex++));
-                else { ((Timer)e.getSource()).stop(); SwingUtilities.invokeLater(() -> historyModel.addElement(new TestRecord(lastAlgoName, lastSteps, lastWeight))); return; }
+                if(animationIndex < visitedNodes.size()) {
+                    currentAnimatedVisits.add(visitedNodes.get(animationIndex++));
+                    
+                    if (animationIndex % 10 == 0 && !dynamicWallQueue.isEmpty()) { //boyanan 10 hucrede 1 duvar degistir
+                        processDynamicWall(dynamicWallQueue.remove(0));
+                    }
+                }
+                else if(pathIndex < finalPath.size()) {
+                    currentAnimatedPath.add(finalPath.get(pathIndex++));
+                }
+                else {
+                    ((Timer)e.getSource()).stop();
+                    SwingUtilities.invokeLater(() -> historyModel.addElement(new TestRecord(lastAlgoName, lastSteps, lastWeight)));
+                    dynamicWallQueue.clear(); // Temizlik
+                    return;
+                }
             }
             mazeCanvas.repaint();
         });

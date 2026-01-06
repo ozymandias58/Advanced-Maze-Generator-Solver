@@ -70,6 +70,7 @@ int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUp
         int r = rand() % rows;
         int c = rand() % cols;
         u = c + (r * cols);
+        
 
         int dir = rand() % 4;
         int nr = r, nc = c;

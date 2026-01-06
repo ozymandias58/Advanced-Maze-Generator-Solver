@@ -7,7 +7,7 @@
 #define INF 999999 //representing infinity
 #define COST 90000
 //Dynamic
-#define FREQUENCY 3
+#define FREQUENCY 10
 #define DYNAMICUPDATESIZE 252
 #define DYNAMICINDEXSIZE 123
 

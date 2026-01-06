@@ -34,6 +34,8 @@ int applyTheDynamicChanges(int rows, int cols, int totalCells, int** adjMat, Tes
         res->dynamicChangeIndexes[*changeIndex] = res->exploredCount;
         (*changeIndex)++;
     }
+    /*MatrixUpdate up1 = res->dynamicChangeUpdates[(*updateIndex)-2];
+    MatrixUpdate up2 = res->dynamicChangeUpdates[(*updateIndex)-1];*/
     return u; // Duvarı değişen hücreyi döndürüyor
 }   
 
@@ -55,19 +57,31 @@ TestResult solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
     res.dynamicChangeIndexes=(int*)safe_malloc(sizeof(int)*DYNAMICINDEXSIZE);//en kotu ihtimal 400/5 değişim olur yani 80 ben 100 koydum garanti olsun diye
     while(!isEmptyQ(q)){
         int current=dequeue(q);
+        int p=parent[current];
+        if (p != -1 && AdjMatrix[p][current] == 0) { // Eğer başlangıç değilse ve geldiği yol artk duvarsa
+            visited[current] = 0; // Bu yolu geçersiz say ve hücreyi tekrar aç
+            continue;
+            }
         BFSexplored[BFSexplored_size].x=current/collumns;
         BFSexplored[BFSexplored_size].y=current%collumns;
         res.exploredCount = ++BFSexplored_size;
         if(dynamicMode&&res.exploredCount%frequency==0){
             u=applyTheDynamicChanges(rows, collumns, totalCellCount, AdjMatrix, &res, &updateIndex, &changeIndex);
             if (u != -1) {
-                for (i = 0; i < totalCellCount; i++) {
+                MatrixUpdate addUp = res.dynamicChangeUpdates[updateIndex-1];
+                int nodeU = addUp.u;
+                int nodeV = addUp.v;
+                visited[nodeU] = 0;
+                visited[nodeV] = 0;
+                enqueue(q, nodeU);
+                enqueue(q, nodeV);
+/*                for (i = 0; i < totalCellCount; i++) {
                     if (AdjMatrix[u][i] > 0 && !visited[i]) {
                         visited[i] = 1;
                         parent[i] = u;
                         enqueue(q, i); 
                     }
-                }
+                }*/
             }
         }
         if (current==end) {
@@ -144,6 +158,11 @@ TestResult solve_DFS(int start, int end, int rows, int collumns, int** AdjMatrix
     int foundFlag=0;
     while(!isEmptyS(s)){
         int current=pop(s);
+        int p=parent[current];
+        if (p != -1 && AdjMatrix[p][current] == 0) {
+            visited[current] = 0;
+            continue;
+            }
         DFSexplored[DFSexplored_size].x=current/collumns;
         DFSexplored[DFSexplored_size].y=current%collumns;
         
@@ -151,13 +170,20 @@ TestResult solve_DFS(int start, int end, int rows, int collumns, int** AdjMatrix
         if (dynamicMode&&res.exploredCount % frequency == 0) {
             u=applyTheDynamicChanges(rows, collumns, totalCellCount, AdjMatrix, &res, &updateIndex, &changeIndex);
             if(u!=-1){
-                for (i = 0; i< totalCellCount; i++) {
+                MatrixUpdate addUp = res.dynamicChangeUpdates[updateIndex-1];
+                int nodeU = addUp.u;
+                int nodeV = addUp.v;
+                visited[nodeU] = 0;
+                visited[nodeV] = 0;
+                push(s, nodeU);
+                push(s, nodeV);
+                /*for (i = 0; i< totalCellCount; i++) {
                     if (AdjMatrix[u][i] > 0 && !visited[i]) {
                         visited[i] = 1;
                         parent[i] = u;
                         push(s, i);
                     }
-                }
+                }*/
             }
         }
         if(current == end){
