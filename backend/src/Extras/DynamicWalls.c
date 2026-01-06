@@ -5,6 +5,12 @@
 #include <stdlib.h>
 #include <time.h>
 
+void printUpdateToJava(MatrixUpdate up) {
+    // java tarafı (yani gui) "DYNA: u v w" seklinde alıyor ve REMOVE ise w zaten 0 gelecek o yüzden sıkıntı yok
+    printf("DYNA: %d %d %d\n", up.u, up.v, up.w);
+    fflush(stdout);
+}
+
 void DynamicSTKpush(int *stk, int v, int *top) {
     stk[++(*top)] = v;
 }
@@ -26,7 +32,7 @@ int DynamicWallDFS(int totalCells, int** adjMat, int src, int target) {
         int cur = DynamicSTKpop(stk, &top);
         
         for(int i = 0; i < totalCells; i++) {
-            if(adjMat[cur][i] == 1 && visited[i] == 0) {
+            if(adjMat[cur][i]>0 && visited[i] == 0) {
                 if(i == target) {
                     free(stk);
                     free(visited);
@@ -42,9 +48,10 @@ int DynamicWallDFS(int totalCells, int** adjMat, int src, int target) {
     return -1;
 }
 
-void initDynamicModule(MatrixUpdate* updates, int *updateIndex){
-    updates = (MatrixUpdate*)safe_malloc(10*sizeof(MatrixUpdate));
+MatrixUpdate* initDynamicModule(int *updateIndex){
+    MatrixUpdate* updates = (MatrixUpdate*)safe_malloc(200*sizeof(MatrixUpdate));
     *updateIndex = 0;
+    return updates;
 }
 
 int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUpdate* updates, int *updateIndex) {
@@ -55,10 +62,11 @@ int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUp
 
     //add the change to updates
     //return u
-    int u = -1, v = -1;
+    int u = -1, v = -1,attempt=0;;
     
     // find a potential v
-    while(u == -1) {
+    while(u == -1&&attempt<100) {
+        attempt++;
         int r = rand() % rows;
         int c = rand() % cols;
         u = c + (r * cols);
@@ -82,15 +90,18 @@ int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUp
     // find path from v to u to find n
     int n = DynamicWallDFS(totalCells, adjMat, v, u);
 
-    if (n != -1) {
+    if (n != -1&&(*updateIndex)<198) {
         //sever n-u and connect v-u
         int temp_w = adjMat[u][n];
+        if(temp_w==0) temp_w=1;
         adjMat[u][n] = adjMat[n][u] = 0;
         adjMat[u][v] = adjMat[v][u] = temp_w;
         MatrixUpdate addU = {UPDATE_ADD,u,v,temp_w};
         MatrixUpdate severU = {UPDATE_REMOVE,u,n,0};
         updates[(*updateIndex)++] = addU;
         updates[(*updateIndex)++] = severU;
+        printUpdateToJava(severU);
+        printUpdateToJava(addU);
     }
     return u;
 }
