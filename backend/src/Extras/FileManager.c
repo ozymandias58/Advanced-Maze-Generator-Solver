@@ -39,9 +39,18 @@ cJSON* convertTesttoJSON(TestResult test){
     return testObj;
 }
 
-void createJSON(int **adjMat,int rows, int cols, TestResult* testArr, int testSize){
+void createJSON(int **adjMat,int rows, int cols, TestResult* testArr, int testSize,int option_weight, int option_dynamic, int option_multi){
     int totalCells = rows*cols;
     cJSON *root = cJSON_CreateObject();
+
+    cJSON_AddStringToObject(root,"file_type","MAZE_SOLVER_DATA");
+
+    cJSON *options = cJSON_CreateObject();
+    cJSON_AddNumberToObject(options,"weight",option_weight);
+    cJSON_AddNumberToObject(options,"dynamic",option_dynamic);
+    cJSON_AddNumberToObject(options,"multi",option_multi);
+
+    cJSON_AddItemToObject(root,"options",options);
 
     cJSON *jsonMatrix = cJSON_CreateArray(); //create the matrix
     for(int i=0; i<totalCells; i++){
@@ -57,4 +66,45 @@ void createJSON(int **adjMat,int rows, int cols, TestResult* testArr, int testSi
     }
     cJSON_AddItemToObject(root,"tests",jsonTestArr);
     saveJSONtoFile(root);
+}
+
+cJSON* get_json_from_file(char *filename) {
+    FILE *file = fopen(filename, "rb");
+    if (file == NULL) {
+        return NULL;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char *data = (char*)malloc(length + 1);
+    if (data == NULL) {
+        fclose(file);
+        return NULL;
+    }
+    fread(data, 1, length, file);
+    data[length] = '\0';
+    fclose(file);
+
+    cJSON *root = cJSON_Parse(data);
+    
+    free(data);
+
+    if (root == NULL) {
+        const char *error_ptr = cJSON_GetErrorPtr();
+        if (error_ptr != NULL) {
+            fprintf(stderr, "Error before: %s\n", error_ptr);
+        }
+        return NULL;
+    }
+
+    cJSON *type = cJSON_GetObjectItem(root, "file_type");
+    if (!cJSON_IsString(type) || strcmp(type->valuestring, "MAZE_SOLVER_DATA") != 0) {
+        printf("Validation Error: This file is not a valid maze solver JSON!\n");
+        cJSON_Delete(root);
+        return NULL;
+    }
+
+    return root;
 }
