@@ -26,10 +26,10 @@ Coordinate ASTexplored[DEFAULTSIZE];
 int ASTexplored_size = 0;
 int dynamicMode = 0;//global variable to check if dynamic mode is enabled or not
 
-int applyTheDynamicChanges(int rows, int cols, int totalCells, int** adjMat, TestResult* res, int* updateIndex, int* changeIndex) {
+int applyTheDynamicChanges(int rows, int cols, int totalCells, int** adjMat, TestResult* res, int* updateIndex, int* changeIndex,int* visited) {
     if (!dynamicMode) return -1;
     if (*updateIndex >= DYNAMICUPDATESIZE - 2) return -1;
-    int u = DynamicWallChange(rows, cols, totalCells, adjMat, res->dynamicChangeUpdates, updateIndex);
+    int u = DynamicWallChange(rows, cols, totalCells, adjMat, res->dynamicChangeUpdates, updateIndex,visited);
     if(u!=-1){
         res->dynamicChangeIndexes[*changeIndex] = res->exploredCount;
         (*changeIndex)++;
@@ -66,9 +66,9 @@ TestResult solve_BFS(int start,int end,int rows,int collumns,int** AdjMatrix){
         BFSexplored[BFSexplored_size].y=current%collumns;
         res.exploredCount = ++BFSexplored_size;
         if(dynamicMode&&res.exploredCount%frequency==0){
-            u=applyTheDynamicChanges(rows, collumns, totalCellCount, AdjMatrix, &res, &updateIndex, &changeIndex);
+            u=applyTheDynamicChanges(rows, collumns, totalCellCount, AdjMatrix, &res, &updateIndex, &changeIndex,visited);
             if (u != -1) {
-                MatrixUpdate addUp = res.dynamicChangeUpdates[updateIndex-1];
+                MatrixUpdate addUp = res.dynamicChangeUpdates[updateIndex-2];
                 int nodeU = addUp.u;
                 int nodeV = addUp.v;
                 visited[nodeU] = 0;
@@ -168,9 +168,9 @@ TestResult solve_DFS(int start, int end, int rows, int collumns, int** AdjMatrix
         
         res.exploredCount= ++DFSexplored_size;
         if (dynamicMode&&res.exploredCount % frequency == 0) {
-            u=applyTheDynamicChanges(rows, collumns, totalCellCount, AdjMatrix, &res, &updateIndex, &changeIndex);
+            u=applyTheDynamicChanges(rows, collumns, totalCellCount, AdjMatrix, &res, &updateIndex, &changeIndex,visited);
             if(u!=-1){
-                MatrixUpdate addUp = res.dynamicChangeUpdates[updateIndex-1];
+                MatrixUpdate addUp = res.dynamicChangeUpdates[updateIndex-2];
                 int nodeU = addUp.u;
                 int nodeV = addUp.v;
                 visited[nodeU] = 0;
@@ -272,7 +272,7 @@ TestResult solve_Dijkstra(int start, int end, int rows, int collumns, int** AdjM
         DJKexplored_size++;
         res.exploredCount = DJKexplored_size;
         if(dynamicMode&&res.exploredCount>0&&res.exploredCount%frequency==0){
-            int dynamicChangedCell=applyTheDynamicChanges(rows,collumns,totalCellCount,AdjMatrix,&res,&updateIndex,&changeIndex);
+            int dynamicChangedCell=applyTheDynamicChanges(rows,collumns,totalCellCount,AdjMatrix,&res,&updateIndex,&changeIndex,visited);
             if(dynamicChangedCell!=-1&&visited[dynamicChangedCell]){
                 for(neighbour=0;neighbour<totalCellCount;neighbour++){//check neighbours of changed cell
                     int weight=AdjMatrix[dynamicChangedCell][neighbour];
@@ -381,7 +381,7 @@ TestResult solve_Astar(int start, int end, int rows, int collumns, int** AdjMatr
         res.exploredCount=ASTexplored_size;
 
         if(dynamicMode&&res.exploredCount>0&&res.exploredCount%frequency==0){
-            int dynamicChangedCell=applyTheDynamicChanges(rows, collumns, totalCellCount, AdjMatrix, &res, &updateIndex, &changeIndex);
+            int dynamicChangedCell=applyTheDynamicChanges(rows, collumns, totalCellCount, AdjMatrix, &res, &updateIndex, &changeIndex,visited);
             if(dynamicChangedCell!=-1&&visited[dynamicChangedCell]){
                 for(neighbour=0;neighbour<totalCellCount;neighbour++){
                     int weight=AdjMatrix[dynamicChangedCell][neighbour];
