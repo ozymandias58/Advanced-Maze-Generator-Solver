@@ -19,16 +19,17 @@ int DynamicSTKpop(int *stk, int *top) {
     return stk[(*top)--];
 }
 
-int isEdgeProtected(int u, int n, int* parent, int current) {
-    int temp = current;
-    while (temp != -1) {
-        int p = parent[temp];
-        // u,n kenarı p,temp kenarı ile aynıysa korunuyor
-        if ((u == p && n == temp) || (u == temp && n == p)) {
-            return 1; 
-        }
-        temp = p;
+int isEdgeProtected(int u, int n, int v, int* parent, int current, int* visited, int totalCells) {
+    //maviyse duvar oluşmasın
+    if (visited[u] || visited[n]) {
+        return 1; 
     }
+
+    //maviyse yol oluşmasın
+    if (visited[v]) {
+        return 1;
+    }
+
     return 0;
 }
 
@@ -67,59 +68,50 @@ MatrixUpdate* initDynamicModule(int *updateIndex){
     return updates;
 }
 
-int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUpdate* updates, int *updateIndex,int *parent, int current) {
-    //find 1 possible new connection (that node is v)
-    //find a path from v to u through dfs (last is n)
-    //sever the n-u
-    //connect v-u
-
-    //add the change to updates
-    //return u
-    int u = -1, v = -1,attempt=0;;
+int DynamicWallChange(int rows, int cols, int totalCells, int **adjMat, MatrixUpdate* updates, int *updateIndex, int *parent, int current, int *visited) {
+    int u = -1, v = -1, attempt = 0;
     
-    // find a potential v
-    while(u == -1&&attempt<100) {
+    while(u == -1 && attempt < 100) {
         attempt++;
         int r = rand() % rows;
         int c = rand() % cols;
         u = c + (r * cols);
-        
 
         int dir = rand() % 4;
         int nr = r, nc = c;
-        if (dir == 0) nr--;      // Top
-        else if (dir == 1) nr++; // Bottom
-        else if (dir == 2) nc--; // Left
-        else if (dir == 3) nc++; // Right
+        if (dir == 0) nr--; else if (dir == 1) nr++; 
+        else if (dir == 2) nc--; else if (dir == 3) nc++;
 
         if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
             v = nc + (nr * cols);
-            if (adjMat[u][v] == 0) {
+            // Only pick a v that hasn't been visited by the solver yet!
+            if (adjMat[u][v] == 0 && !visited[v]) {
                 break;
             }
         }
         u = -1;
     }
 
-    // find path from v to u to find n
     int n = DynamicWallDFS(totalCells, adjMat, v, u);
 
-    if (n != -1&&(*updateIndex)<198) {
-        if (isEdgeProtected(u, n, parent, current)) {
-        return -1; //bu güncelleme yolu değiştirmeye çalıştı
+    if (n != -1 && (*updateIndex) < 198) {
+        if (isEdgeProtected(u, n, v, parent, current, visited, totalCells)) {
+            return -1; 
         }
 
-        //sever n-u and connect v-u
+        if (visited[n]) return -1;
+
+        // Perform change...
         int temp_w = adjMat[u][n];
-        if(temp_w==0) temp_w=1;
+        if(temp_w == 0) temp_w = 1;
         adjMat[u][n] = adjMat[n][u] = 0;
         adjMat[u][v] = adjMat[v][u] = temp_w;
-        MatrixUpdate addU = {UPDATE_ADD,u,v,temp_w};
-        MatrixUpdate severU = {UPDATE_REMOVE,u,n,0};
-        updates[(*updateIndex)++] = addU;
-        updates[(*updateIndex)++] = severU;
-        printUpdateToJava(severU);
-        printUpdateToJava(addU);
+        
+        updates[(*updateIndex)++] = (MatrixUpdate){UPDATE_ADD, u, v, temp_w};
+        updates[(*updateIndex)++] = (MatrixUpdate){UPDATE_REMOVE, u, n, 0};
+        
+        printUpdateToJava(updates[(*updateIndex)-1]);
+        printUpdateToJava(updates[(*updateIndex)-2]);
     }
     return u;
 }
