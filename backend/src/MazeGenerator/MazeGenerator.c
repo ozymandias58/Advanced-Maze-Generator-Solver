@@ -124,10 +124,6 @@ void kruskalAlgo(edge **edgeList,edge *wallList, int rows, int cols, int* edgeCo
     int verticeCount = rows*cols;
     edge *maxEdgeList;
     maxEdgeList = (edge*)safe_malloc(sizeof(edge)*wallCount); //max size
-    if(maxEdgeList == NULL){
-        printf("not enough memory\n");
-        exit(1);
-    }
     DSU d;
 
     initDSU(&d,verticeCount);
@@ -153,6 +149,13 @@ void kruskalAlgo(edge **edgeList,edge *wallList, int rows, int cols, int* edgeCo
             edge.v = v;
             edge.w = w;
             maxEdgeList[newSize++] = edge;
+        }
+        else if (rand() % 100 < 10) { // %10 ihtimalle kestirme yol aç
+            edge shortcut;
+            shortcut.u = u;
+            shortcut.v = v;
+            shortcut.w = w;
+            maxEdgeList[newSize++] = shortcut;
         }
     }
     *edgeCount = newSize;
