@@ -124,9 +124,10 @@ public class MazeApp extends JFrame {
         // 3. Ağır Yollar (Sadece içini boya)
         Color heavyColor = chkWeighted.isSelected() ? COLOR_HEAVY : COLOR_EMPTY;
         g2.setColor(heavyColor);
-        for (Point p : heavyConnections) {
-            drawCell(g2, p.x * COLS + p.y, startX, startY, cellSize, heavyColor); 
-            drawCell(g2, p.y * COLS + p.x, startX, startY, cellSize, heavyColor); 
+        for(Point p:heavyConnections){
+            connectCells(g2, p.x, p.y, startX, startY, cellSize, heavyColor);
+            drawCell(g2, p.x, startX, startY, cellSize, heavyColor); 
+            drawCell(g2, p.y, startX, startY, cellSize, heavyColor);
         }
 
         // 4. Animasyon (Keşif)
