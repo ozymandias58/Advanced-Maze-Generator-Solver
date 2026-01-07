@@ -44,7 +44,7 @@ extern int DJKexplored_size;
 extern Coordinate ASTexplored[DEFAULTSIZE];
 extern int ASTexplored_size;
 
-int applyTheDynamicChanges(int rows, int cols, int totalCells, int **adjMat, TestResult *res, int *updateIndex, int *changeIndex, int *parent, int current);
+int applyTheDynamicChanges(int rows, int cols, int totalCells, int **adjMat, TestResult *res, int *updateIndex, int *changeIndex, int *parent, int current, int *visited);
 TestResult solve_BFS(int start, int end, int rows, int columns, int** AdjMatrix);
 
 TestResult solve_DFS(int start, int end, int rows, int columns, int** AdjMatrix);

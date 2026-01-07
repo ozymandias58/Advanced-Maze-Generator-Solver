@@ -3,14 +3,14 @@ color a
 setlocal enabledelayedexpansion
 
 echo ======================================================
-echo   Maze Solver Pro: Derleme ve Calistirma Baslatildi
+echo    Maze Solver Pro: Derleme ve Calistirma Baslatildi
 echo ======================================================
 
 :: 1. Backend'i (C) Derle
-echo [1/3] C dosyalari toplaniyor ve derleniyor...
+echo [1/3] C dosyalarini toplaniyor ve derleniyor...
 
-:: PowerShell yardımıyla tüm .c dosyalarını bulup derliyoruz (Recursive)
-powershell -Command "$files = Get-ChildItem -Path 'backend\src' -Recurse -Filter *.c | Select-Object -ExpandProperty FullName; gcc -I 'backend\include' $files -o 'frontend\src\Demo.exe'"
+:: PowerShell ile debugNoGUI.c haricindeki tum .c dosyalarini bulup derliyoruz
+powershell -Command "$files = Get-ChildItem -Path 'backend\src' -Recurse -Filter *.c | Where-Object { $_.Name -ne 'debugNoGUI.c' } | Select-Object -ExpandProperty FullName; gcc -I 'backend\include' $files -o 'frontend\src\Demo.exe'"
 
 if %errorlevel% neq 0 (
     echo [HATA] Backend derlenirken bir sorun olustu!
