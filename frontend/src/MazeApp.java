@@ -36,7 +36,7 @@ public class MazeApp extends JFrame {
     private static final Color COLOR_VISITED = new Color(0, 190, 240); // Cyan
     private static final Color COLOR_PATH = new Color(255, 100, 50);   // Turuncu
     private static final Color COLOR_EMPTY = new Color(245, 245, 250); // Beyaz
-    private static final Color COLOR_HEAVY = new Color(155, 89, 182);  // Mor (Ağır Yol)
+    private static final Color COLOR_HEAVY = new Color(211, 211, 211);  // Mor (Ağır Yol)
     private static final Color COLOR_START = new Color(46, 204, 113);  // Yeşil
     private static final Color COLOR_END = new Color(231, 76, 60);     // Kırmızı
 
